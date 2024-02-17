@@ -1,19 +1,21 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import subprocess
 import spacy
 import nltk
-nltk.download('punkt')
 from nltk.corpus import stopwords
 import heapq
 import streamlit as st
-from pyngrok import ngrok
 
-# Download spaCy model
-spacy.cli.download("en_core_web_sm")
+# Install spaCy model
+subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
+
+# Download NLTK data
+nltk.download('punkt')
 
 # Summarize  text
 def summarize_text(text, num_sentences=10):
