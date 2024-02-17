@@ -5,6 +5,7 @@ import time
 # Install necessary libraries
 st.text("Installing required libraries. This may take a few minutes.")
 subprocess.run(["python", "-m", "pip", "install", "-r", "requirements.txt"])
+subprocess.run(["python", "-m", "pip", "install", "beautifulsoup4"])
 
 # Add a delay to allow for library installation
 time.sleep(5)
