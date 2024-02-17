@@ -1,23 +1,16 @@
-# There are a few librabries that should be installed to make this project run smoothly (with some modifications)
-# Other librabries are already accessible through an import 
-import subprocess
-
-# Install dependencies
-subprocess.run(["pip", "install", "spacy", "nltk", "beautifulsoup4", "streamlit", "pyngrok"])
-
-# Download spaCy model
-subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-
-# Now to define the Streamlit app (with some modifications)
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import spacy
 import nltk
+nltk.download('punkt')
 from nltk.corpus import stopwords
 import heapq
 import streamlit as st
 from pyngrok import ngrok
+
+# Download spaCy model
+spacy.cli.download("en_core_web_sm")
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
