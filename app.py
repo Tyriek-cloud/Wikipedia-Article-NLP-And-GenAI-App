@@ -1,3 +1,11 @@
+# There are a few librabries that should be installed to make this project run smoothly
+# Other librabries are already accessible through an import
+
+!pip install nltk
+!pip install beautifulsoup4
+!pip install -q streamlit
+!pip install pyngrok
+
 # Now to define the Streamlit app (with some modifications)
 import requests
 from bs4 import BeautifulSoup
