@@ -1,15 +1,20 @@
+import subprocess
+
+# Install necessary libraries
+subprocess.run(["pip", "install", "requests", "beautifulsoup4", "spacy", "nltk", "streamlit"])
+
+# Download spaCy model
+subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+
+# Rest of your imports
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-import subprocess
 import spacy
 import nltk
 from nltk.corpus import stopwords
 import heapq
 import streamlit as st
-
-# Install spaCy model
-subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
