@@ -1,32 +1,27 @@
 # There are a few librabries that should be installed to make this project run smoothly (with some modifications)
 # Other librabries are already accessible through an import 
 import subprocess
-
-subprocess.run(["pip", "install", "spacy"])
-subprocess.run(["pip", "install", "nltk"])
-subprocess.run(["pip", "install", "beautifulsoup4"])
-subprocess.run(["pip", "install", "streamlit"])
-subprocess.run(["pip", "install", "pyngrok"])
-
-# Download spacy model
-subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-
-# Now to define the Streamlit app (with some modifications)
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 import spacy
 import nltk
-nltk.download('punkt')
-from nltk.corpus import stopwords
-import heapq
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+import requests
 import streamlit as st
 from pyngrok import ngrok
+
+# Install dependencies
+subprocess.run(["pip", "install", "spacy", "nltk", "beautifulsoup4", "streamlit", "pyngrok"])
+
+# Download spaCy model
+subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
 
-# Summarize  text
+# Download NLTK data
+nltk.download('punkt')
+
+# Summarize text
 def summarize_text(text, num_sentences=10):
     doc = nlp(text)
     sentences = [sent.text for sent in doc.sents]
@@ -36,7 +31,7 @@ def summarize_text(text, num_sentences=10):
 # Extract live URLs from the references section
 def extract_live_urls(url):
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html.parser')  # Specify parser explicitly
 
     references_section = soup.find("span", {"id": "References"})
     if references_section:
@@ -47,10 +42,10 @@ def extract_live_urls(url):
 
     return []
 
-# Extracts images
+# Extract images
 def extract_images(url):
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html.parser')  # Specify parser explicitly
 
     # All image tags are called in
     img_tags = soup.find_all('img')
@@ -96,6 +91,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-# Runs Streamlit
-subprocess.Popen(["streamlit", "run", "app.py"])
