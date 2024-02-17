@@ -2,6 +2,7 @@
 # Other librabries are already accessible through an import 
 import subprocess
 
+subprocess.run(["pip", "install", "spacy"])
 subprocess.run(["pip", "install", "nltk"])
 subprocess.run(["pip", "install", "beautifulsoup4"])
 subprocess.run(["pip", "install", "streamlit"])
