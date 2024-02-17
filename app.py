@@ -1,23 +1,17 @@
-# Load the installed libraries after installation
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
-import spacy
 import nltk
 from urllib.parse import urljoin
 from nltk.corpus import stopwords
 import heapq
 
-# Load spaCy model
-nlp = spacy.load("en_core_web_sm")
-
 # Download NLTK data
 nltk.download('punkt')
 
-# Summarize  text
+# Summarize text
 def summarize_text(text, num_sentences=10):
-    doc = nlp(text)
-    sentences = [sent.text for sent in doc.sents]
+    sentences = nltk.sent_tokenize(text)
     summary = " ".join(sentences[:num_sentences])
     return summary
 
@@ -40,7 +34,7 @@ def extract_images(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # All image tags are called in
+    # All image tags are called 'img'
     img_tags = soup.find_all('img')
 
     # Extracts image URLs
