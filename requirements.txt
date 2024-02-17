@@ -1,5 +1,5 @@
-streamlit
-requests
-beautifulsoup4
-spacy
-nltk
+streamlit==1.31.1
+requests==2.31.0  
+beautifulsoup4==4.12.3  
+spacy==3.7.4      
+nltk==3.8.1 
