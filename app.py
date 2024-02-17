@@ -1,5 +1,6 @@
 # There are a few librabries that should be installed to make this project run smoothly (with some modifications)
 # Other librabries are already accessible through an import 
+import subprocess
 
 subprocess.run(["pip", "install", "nltk"])
 subprocess.run(["pip", "install", "beautifulsoup4"])
@@ -17,7 +18,6 @@ from nltk.corpus import stopwords
 import heapq
 import streamlit as st
 from pyngrok import ngrok
-import subprocess
 
 # Download spaCy model
 spacy.cli.download("en_core_web_sm")
