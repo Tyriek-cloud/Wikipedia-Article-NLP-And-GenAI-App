@@ -1,17 +1,24 @@
 import sys
 import subprocess
 import streamlit as st
+import requests
+from bs4 import BeautifulSoup
+import spacy
+import nltk
+from urllib.parse import urljoin
+from nltk.corpus import stopwords
+import heapq
 
 # Ensure pip is up-to-date
 subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
 
 # Install necessary libraries
 st.text("Installing required libraries. This may take a few minutes.")
-subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+subprocess.run([sys.executable, "-m", "pip", "install", "requests", "beautifulsoup4", "spacy", "nltk"])
 
 # Load the installed libraries after installation
-from pip._vendor import requests
-from pip._vendor.bs4 import BeautifulSoup
+import requests
+from bs4 import BeautifulSoup
 import spacy
 import nltk
 from urllib.parse import urljoin
