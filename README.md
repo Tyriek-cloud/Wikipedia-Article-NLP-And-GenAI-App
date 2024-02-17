@@ -14,3 +14,5 @@ This will pull in links to images from the Wikipedia article. These URLs are cli
 # IMPORTANT DISCLAIMER
 
 The structure of the Wikiepedia article may impact whether a summary is actually generated. Image URLs are always pulled in.
+
+The base code for this app was written in Google Colab: https://colab.research.google.com/drive/1RDKGcidcVlpzs2kT-9SB0WKN2NaA4sft?usp=sharing
