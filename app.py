@@ -88,7 +88,7 @@ if __name__ == "__main__":
     main()
 
 # This will give me the password to run Streamlit locally
-! wget -q -O - ipv4.icanhazip.com
+!wget -q -O - ipv4.icanhazip.com
 
 # Runs Streamlit
-! streamlit run app.py & npx localtunnel --port 8501
+!streamlit run app.py & npx localtunnel --port 8501
