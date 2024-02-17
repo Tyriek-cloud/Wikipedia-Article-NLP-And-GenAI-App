@@ -1,18 +1,17 @@
-import streamlit as st
+import sys
 import subprocess
-import time
+import streamlit as st
+
+# Ensure pip is up-to-date
+subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
 
 # Install necessary libraries
 st.text("Installing required libraries. This may take a few minutes.")
-subprocess.run(["python", "-m", "pip", "install", "-r", "requirements.txt"])
-subprocess.run(["python", "-m", "pip", "install", "beautifulsoup4"])
-
-# Add a delay to allow for library installation
-time.sleep(5)
+subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
 # Load the installed libraries after installation
-import requests
-from bs4 import BeautifulSoup
+from pip._vendor import requests
+from pip._vendor.bs4 import BeautifulSoup
 import spacy
 import nltk
 from urllib.parse import urljoin
