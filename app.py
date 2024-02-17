@@ -1,13 +1,6 @@
 # There are a few librabries that should be installed to make this project run smoothly (with some modifications)
 # Other librabries are already accessible through an import 
 import subprocess
-import spacy
-import nltk
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-import requests
-import streamlit as st
-from pyngrok import ngrok
 
 # Install dependencies
 subprocess.run(["pip", "install", "spacy", "nltk", "beautifulsoup4", "streamlit", "pyngrok"])
@@ -15,13 +8,21 @@ subprocess.run(["pip", "install", "spacy", "nltk", "beautifulsoup4", "streamlit"
 # Download spaCy model
 subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
 
+# Now to define the Streamlit app (with some modifications)
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+import spacy
+import nltk
+from nltk.corpus import stopwords
+import heapq
+import streamlit as st
+from pyngrok import ngrok
+
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
 
-# Download NLTK data
-nltk.download('punkt')
-
-# Summarize text
+# Summarize  text
 def summarize_text(text, num_sentences=10):
     doc = nlp(text)
     sentences = [sent.text for sent in doc.sents]
@@ -31,7 +32,7 @@ def summarize_text(text, num_sentences=10):
 # Extract live URLs from the references section
 def extract_live_urls(url):
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')  # Specify parser explicitly
+    soup = BeautifulSoup(response.text, 'html.parser')
 
     references_section = soup.find("span", {"id": "References"})
     if references_section:
@@ -42,10 +43,10 @@ def extract_live_urls(url):
 
     return []
 
-# Extract images
+# Extracts images
 def extract_images(url):
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')  # Specify parser explicitly
+    soup = BeautifulSoup(response.text, 'html.parser')
 
     # All image tags are called in
     img_tags = soup.find_all('img')
