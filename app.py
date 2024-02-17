@@ -8,6 +8,9 @@ subprocess.run(["pip", "install", "beautifulsoup4"])
 subprocess.run(["pip", "install", "streamlit"])
 subprocess.run(["pip", "install", "pyngrok"])
 
+# Download spacy model
+subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+
 # Now to define the Streamlit app (with some modifications)
 import requests
 from bs4 import BeautifulSoup
@@ -19,9 +22,6 @@ from nltk.corpus import stopwords
 import heapq
 import streamlit as st
 from pyngrok import ngrok
-
-# Download spaCy model
-spacy.cli.download("en_core_web_sm")
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -96,10 +96,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Modification to allow me to access my public IP address from within a Python scrip
-public_ip = subprocess.check_output(["wget", "-q", "-O", "-", "ipv4.icanhazip.com"])
-public_ip = public_ip.decode("utf-8").strip()
-
+    
 # Runs Streamlit
-subprocess.run(["streamlit", "run", "app.py", "&", "npx", "localtunnel", "--port", "8501"])
+subprocess.Popen(["streamlit", "run", "app.py"])
