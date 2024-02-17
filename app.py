@@ -87,8 +87,9 @@ def main():
 if __name__ == "__main__":
     main()
 
-# This will give me the password to run Streamlit locally
-!wget -q -O - ipv4.icanhazip.com
+# Modification to allow me to access my public IP address from within a Python scrip
+public_ip = subprocess.check_output(["wget", "-q", "-O", "-", "ipv4.icanhazip.com"])
+public_ip = public_ip.decode("utf-8").strip()
 
 # Runs Streamlit
-!streamlit run app.py & npx localtunnel --port 8501
+subprocess.run(["streamlit", "run", "app.py", "&", "npx", "localtunnel", "--port", "8501"])
