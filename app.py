@@ -1,3 +1,4 @@
+# Now to define the Streamlit app (with some modifications)
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -85,3 +86,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# This will give me the password to run Streamlit locally
+! wget -q -O - ipv4.icanhazip.com
+
+# Runs Streamlit
+! streamlit run app.py & npx localtunnel --port 8501
