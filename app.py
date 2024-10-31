@@ -82,7 +82,7 @@ def search_article(question):
         tfidf_matrix = vectorizer.fit_transform([article_text, question])
         similarity = (tfidf_matrix[0] * tfidf_matrix[1:].T).A[0][0]
         
-         if similarity > 0.1:
+        if similarity > 0.1:
             return f"From the article: '{question}' is mentioned."
     return None
 
