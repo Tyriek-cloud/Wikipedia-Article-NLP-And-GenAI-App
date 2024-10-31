@@ -71,7 +71,7 @@ def wit_ai_response(message):
         intents = data.get('intents', [])
         entities = data.get('entities', {})
 
-         if intents:
+        if intents:
             intent_name = intents[0]['name']
             return f"I understand you're asking about {intent_name}. How can I assist you further?"
         
