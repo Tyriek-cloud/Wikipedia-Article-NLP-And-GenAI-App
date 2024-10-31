@@ -156,8 +156,8 @@ def main():
         st.sidebar.write("Bot:", answer)
     else:
     # Next, the app will consult Wit.ai if no answer is found
-    response = wit_ai_response(user_question)
-    st.sidebar.write("Bot:", response)
+        response = wit_ai_response(user_question)
+        st.sidebar.write("Bot:", response)
     else:
         st.sidebar.write("Bot: Please ask a question about the article.")
 
