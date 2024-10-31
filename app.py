@@ -5,7 +5,12 @@ from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
 from nltk.corpus import stopwords
+from dotenv import load_dotenv
+import os
 import heapq
+
+# Loading any necessary environment variables from .env file
+load_dotenv()
 
 # Download NLTK data
 nltk.download('punkt')
