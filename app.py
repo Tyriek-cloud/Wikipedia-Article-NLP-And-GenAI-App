@@ -68,6 +68,7 @@ def wit_ai_response(message):
     
     if response.status_code == 200:
         data = response.json()
+        print(data)
         # Process the response as needed, here we'll just return the message text
         return data.get('msg', 'Sorry, I didn\'t understand that.')
     else:
