@@ -19,26 +19,25 @@ def summarize_text(text, num_sentences=10):
     return summary
 
 # Extract live URLs from the references section
-'''
-def extract_live_urls(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
+#def extract_live_urls(url):
+#    response = requests.get(url)
+#    soup = BeautifulSoup(response.text, 'html.parser')
 
-    references_section = soup.find("span", {"id": "References"})
-    if references_section:
-        references_list = references_section.find_next(["ol", "ul"])
-        if references_list:
-            live_references = []
-            for li in references_list.find_all('li'):
-                links = li.find_all('a', href=True)
-                for link in links:
-                    link_text = link.get_text()
-                    link_url = urljoin(url, link['href'])
-                    live_references.append((link_text, link_url))
-            return live_references
+#    references_section = soup.find("span", {"id": "References"})
+#     if references_section:
+  #       references_list = references_section.find_next(["ol", "ul"])
+    #     if references_list:
+      #       live_references = []
+        #     for li in references_list.find_all('li'):
+          #       links = li.find_all('a', href=True)
+            #     for link in links:
+              #       link_text = link.get_text()
+                #     link_url = urljoin(url, link['href'])
+                  #   live_references.append((link_text, link_url))
+         #    return live_references
 
-    return []
-'''
+ #    return []
+
 # Extracts images
 def extract_images(url):
     response = requests.get(url)
