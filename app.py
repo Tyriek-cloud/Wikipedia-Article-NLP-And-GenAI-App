@@ -34,9 +34,9 @@ def summarize_text(text, num_sentences=10):
                     link_text = link.get_text()
                     link_url = urljoin(url, link['href'])
                     live_references.append((link_text, link_url))
-            return live_references
+            return live_references '''
 
-    return [] ''''
+    return []
 
 # Extracts images
 def extract_images(url):
