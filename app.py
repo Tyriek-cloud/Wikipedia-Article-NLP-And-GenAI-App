@@ -5,15 +5,16 @@ from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
 import spacy
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Download NLTK data
 nltk.download('punkt')
 
-# Loading spacy
-import spacy
+# Load SpaCy model
+nlp = spacy.load("en_core_web_sm")
 
 # Global variable to hold the article text
-# Going to use this to help the bot search an article in real time
 article_text = ""
 
 # Summarize text
@@ -22,40 +23,15 @@ def summarize_text(text, num_sentences=10):
     summary = " ".join(sentences[:num_sentences])
     return summary
 
-# Extract live URLs from the references section
-#def extract_live_urls(url):
-#    response = requests.get(url)
-#    soup = BeautifulSoup(response.text, 'html.parser')
-
-#    references_section = soup.find("span", {"id": "References"})
-#     if references_section:
-  #       references_list = references_section.find_next(["ol", "ul"])
-    #     if references_list:
-      #       live_references = []
-        #     for li in references_list.find_all('li'):
-          #       links = li.find_all('a', href=True)
-            #     for link in links:
-              #       link_text = link.get_text()
-                #     link_url = urljoin(url, link['href'])
-                  #   live_references.append((link_text, link_url))
-         #    return live_references
-
- #    return []
-
-# Extracts images
+# Extract images
 def extract_images(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-
-    # All image tags are called 'img'
     img_tags = soup.find_all('img')
-
-    # Extracts image URLs (if available)
     image_urls = [urljoin(url, img['src']) for img in img_tags if img.has_attr('src')]
-
     return image_urls
 
-# Call Function to communicate with my Wit.ai app
+# Call Function to communicate with Wit.ai app
 def wit_ai_response(message):
     access_token = st.secrets["wit"]["access_token"]
     if not access_token:
@@ -79,7 +55,6 @@ def wit_ai_response(message):
             intent_name = intents[0]['name']
             return f"I understand you're asking about {intent_name}. How can I assist you further?"
         
-        # If entities are present, include them in the response
         if entities:
             entity_name = next(iter(entities))  # Get the first entity
             return f"I see you're interested in {entity_name}. Let me help you with that."
@@ -100,9 +75,31 @@ def search_article(question):
         index = cosine_similarities.argsort()[0][-1]
         similarity_score = cosine_similarities[0][index]
         
-        if similarity > 0.1:
-            return f"From the article: '{question}' is mentioned."
+        if similarity_score > 0.1:
+            return f"From the article: '{sentences[index]}'"
+    
     return "I'm sorry, but I couldn't find an answer in the article."
+
+# Categorize the user's question
+def categorize_question(question):
+    factual_keywords = ["what", "who", "when", "where", "how many", "define"]
+    general_keywords = ["opinion", "suggest", "recommend", "feel"]
+
+    question_lower = question.lower()
+    
+    if any(keyword in question_lower for keyword in factual_keywords):
+        return "factual"
+    elif any(keyword in question_lower for keyword in general_keywords):
+        return "general"
+    else:
+        return "other"
+
+# Analyze the question for entities
+def analyze_question(question):
+    doc = nlp(question)
+    entities = [(ent.text, ent.label_) for ent in doc.ents]
+    noun_phrases = list(doc.noun_chunks)
+    return entities, noun_phrases
 
 # Main function
 def main():
@@ -114,11 +111,10 @@ def main():
 
     # Main content
     if st.button("Analyze"):
-        global article_text  # Global variable to hold the article info
+        global article_text
         try:
-            # Extract and summarize the text
             response = requests.get(url_input)
-            response.raise_for_status() # Bad responses
+            response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             content = soup.find("div", class_="mw-parser-output")
             paragraphs = content.find_all("p")
@@ -126,17 +122,9 @@ def main():
             article_text = full_text
             summary = summarize_text(full_text)
 
-            # Display summary
             st.subheader("Summary:")
             st.write(summary)
 
-            # Extract live URLs from the references section
-            # live_references = extract_live_urls(url_input)
-            # st.subheader("Live References:")
-            # for text, url in live_references:
-              #   st.markdown(f"[{text}]({url})")  # Render as a clickable lin
-
-            # Extract images
             image_urls = extract_images(url_input)
             st.subheader("Image URLs:")
             for idx, url in enumerate(image_urls, start=1):
@@ -145,72 +133,27 @@ def main():
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
-            
-    # The user's method to talk to the Chatbot (Chatbot functionality)
+
+    # User's method to talk to the chatbot
     st.sidebar.header("Beep Boop: Talk with me")
     user_question = st.sidebar.text_input("Ask a question about the article:")
 
     if user_question:
-        answer = search_article(user_question)
-    if answer:
-        st.sidebar.write("Bot:", answer)
-    else:
-    # Next, the app will consult Wit.ai if no answer is found
-        response = wit_ai_response(user_question)
-        st.sidebar.write("Bot:", response)
-    elif:
-        st.sidebar.write("Bot: Please ask a question about the article.")
-
-    def categorize_question(question):
-        factual_keywords = ["what", "who", "when", "where", "how many", "define"]
-        general_keywords = ["opinion", "suggest", "recommend", "feel"]
-
-        question_lower = question.lower()
-    
-        if any(keyword in question_lower for keyword in factual_keywords):
-            return "factual"
-        elif any(keyword in question_lower for keyword in general_keywords):
-            return "general"
-        else:
-            return "other"
-    
-    if st.sidebar.button("Get Response"):
-        if user_question:
-            question_type = categorize_question(user_question)
+        question_type = categorize_question(user_question)
         
         if question_type == "factual":
             answer = search_article(user_question)
-            if answer:
-                st.sidebar.write("Bot:", answer)
-            else:
-                response = wit_ai_response(user_question)
-                st.sidebar.write("Bot:", response)
+            st.sidebar.write("Bot:", answer)
         elif question_type == "general":
             response = wit_ai_response(user_question)
             st.sidebar.write("Bot:", response)
         else:
             st.sidebar.write("Bot: I couldn't categorize your question. Please ask something specific.")
 
-    def analyze_question(question):
-        doc = nlp(question)
-        entities = [(ent.text, ent.label_) for ent in doc.ents]
-        noun_phrases = list(doc.noun_chunks)
-    
-    return entities, noun_phrases
-
-    if st.sidebar.button("Get Response"):
-        if user_question:
-            entities, noun_phrases = analyze_question(user_question)
-        
+        # Analyze question for entities
+        entities, noun_phrases = analyze_question(user_question)
         if entities:
             st.sidebar.write("Bot: I found these entities in your question:", entities)
-        
-        answer = search_article(user_question)
-        if answer:
-            st.sidebar.write("Bot:", answer)
-        else:
-            response = wit_ai_response(user_question)
-            st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
     main()
