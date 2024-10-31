@@ -25,7 +25,7 @@ def extract_live_urls(url):
 
     references_section = soup.find("span", {"id": "References"})
     if references_section:
-        references = references_section.find_next("ul")
+        references = references_section.find_next("ol")
         if references:
             # urls = [a['href'] for a in references.find_all('a', href=True)]
             urls = [urljoin(url, a['href']) for a in references.find_all('a', href=True)]
