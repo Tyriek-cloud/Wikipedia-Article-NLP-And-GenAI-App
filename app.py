@@ -9,6 +9,9 @@ import spacy
 # Download NLTK data
 nltk.download('punkt')
 
+# Loading spacy
+import spacy
+
 # Global variable to hold the article text
 # Going to use this to help the bot search an article in real time
 article_text = ""
