@@ -19,7 +19,8 @@ def summarize_text(text, num_sentences=10):
     return summary
 
 # Extract live URLs from the references section
-'''def extract_live_urls(url):
+'''
+def extract_live_urls(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -34,10 +35,10 @@ def summarize_text(text, num_sentences=10):
                     link_text = link.get_text()
                     link_url = urljoin(url, link['href'])
                     live_references.append((link_text, link_url))
-            return live_references '''
+            return live_references
 
-    #return []
-
+    return []
+'''
 # Extracts images
 def extract_images(url):
     response = requests.get(url)
