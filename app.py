@@ -4,15 +4,13 @@ import requests
 from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
-from nltk.corpus import stopwords
-import heapq
 
 # Download NLTK data
 nltk.download('punkt')
 
 # Global variable to hold the article text
 # Going to use this to help the bot search an article in real time
-article_text = full_text
+article_text = ""
 
 # Summarize text
 def summarize_text(text, num_sentences=10):
@@ -96,6 +94,7 @@ def main():
             content = soup.find("div", class_="mw-parser-output")
             paragraphs = content.find_all("p")
             full_text = "\n".join([p.text for p in paragraphs])
+            article_text = full_text
             summary = summarize_text(full_text)
 
             # Display summary
