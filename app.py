@@ -147,6 +147,17 @@ def main():
     st.sidebar.header("Beep Boop: Talk with me")
     user_question = st.sidebar.text_input("Ask a question about the article:")
 
+    if user_question:
+        answer = search_article(user_question)
+    if answer:
+        st.sidebar.write("Bot:", answer)
+    else:
+    # Next, the app will consult Wit.ai if no answer is found
+    response = wit_ai_response(user_question)
+    st.sidebar.write("Bot:", response)
+    else:
+        st.sidebar.write("Bot: Please ask a question about the article.")
+
     def categorize_question(question):
         factual_keywords = ["what", "who", "when", "where", "how many", "define"]
         general_keywords = ["opinion", "suggest", "recommend", "feel"]
@@ -176,17 +187,27 @@ def main():
             st.sidebar.write("Bot:", response)
         else:
             st.sidebar.write("Bot: I couldn't categorize your question. Please ask something specific.")
-        #if user_question:
-            # First, the app will search the article for an answer
-         #   answer = search_article(user_question)
-          #  if answer:
-                st.sidebar.write("Bot:", answer)
-          #  else:
-                # Next, the app will consult Wit.ai if no answer is found
-           #     response = wit_ai_response(user_question)
-            #    st.sidebar.write("Bot:", response)
-      #  else:
-        #    st.sidebar.write("Bot: Please ask a question about the article.")
+
+    def analyze_question(question):
+        doc = nlp(question)
+        entities = [(ent.text, ent.label_) for ent in doc.ents]
+        noun_phrases = list(doc.noun_chunks)
+    
+    return entities, noun_phrases
+
+    if st.sidebar.button("Get Response"):
+        if user_question:
+            entities, noun_phrases = analyze_question(user_question)
+        
+        if entities:
+            st.sidebar.write("Bot: I found these entities in your question:", entities)
+        
+        answer = search_article(user_question)
+        if answer:
+            st.sidebar.write("Bot:", answer)
+        else:
+            response = wit_ai_response(user_question)
+            st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
     main()
