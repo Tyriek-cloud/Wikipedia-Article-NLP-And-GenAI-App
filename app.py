@@ -26,10 +26,15 @@ def extract_live_urls(url):
     references_section = soup.find("span", {"id": "References"})
     if references_section:
         references_list = references_section.find_next(["ol", "ul"])
-        # urls = [a['href'] for a in references.find_all('a', href=True)]
         if references_list:
-            urls = [urljoin(url, a['href']) for a in references_list.find_all('a', href=True)]
-            return urls
+            live_references = []
+            for li in references_list.find_all('li'):
+                links = li.find_all('a', href=True)
+                for link in links:
+                    link_text = link.get_text()
+                    link_url = urljoin(url, link['href'])
+                    live_references.append((link_text, link_url))
+            return live_references
 
     return []
 
@@ -103,10 +108,10 @@ def main():
             st.write(summary)
 
             # Extract live URLs from the references section
-            live_urls = extract_live_urls(url_input)
-            st.subheader("Live URLs from References:")
-            for url in live_urls:
-                st.write(url)
+            live_references = extract_live_references(url_input)
+            st.subheader("Live References:")
+            for text, url in live_references:
+                st.markdown(f"[{text}]({url})")  # Render as a clickable link
 
             # Extract images
             image_urls = extract_images(url_input)
