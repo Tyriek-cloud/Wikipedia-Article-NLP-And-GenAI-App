@@ -108,10 +108,10 @@ def main():
             st.write(summary)
 
             # Extract live URLs from the references section
-            '''live_references = extract_live_urls(url_input)
-            st.subheader("Live References:")
-            for text, url in live_references:
-                st.markdown(f"[{text}]({url})")  # Render as a clickable link '''
+            # live_references = extract_live_urls(url_input)
+            # st.subheader("Live References:")
+            # for text, url in live_references:
+              #   st.markdown(f"[{text}]({url})")  # Render as a clickable lin
 
             # Extract images
             image_urls = extract_images(url_input)
