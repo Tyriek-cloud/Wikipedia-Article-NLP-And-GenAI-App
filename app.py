@@ -43,6 +43,26 @@ def extract_images(url):
 
     return image_urls
 
+# Call Function to communicate with my Wit.ai app
+def wit_ai_response(message):
+    access_token = ''
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    params = {
+        'v': '20220217',  # API version date
+        'q': message
+    }
+    
+    response = requests.get('https://api.wit.ai/message', headers=headers, params=params)
+    
+    if response.status_code == 200:
+        data = response.json()
+        # Process the response as needed, here we'll just return the message text
+        return data.get('msg', 'Sorry, I didn\'t understand that.')
+    else:
+        return 'Error: Could not contact Wit.ai.'
+
 # Main function
 def main():
     st.title("Wikipedia Article Analyzer")
@@ -76,6 +96,15 @@ def main():
         st.subheader("Image URLs:")
         for idx, url in enumerate(image_urls, start=1):
             st.write(url)
+
+    # The user's method to talk to the Chatbot (Chatbot functionality)
+    st.sidebar.header("Beep Boop: Talk with me")
+    user_question = st.sidebar.text_input("Ask a question about the article:")
+    
+    if st.sidebar.button("Get Response"):
+        if user_question:
+            response = wit_ai_response(user_question)
+            st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
     main()
