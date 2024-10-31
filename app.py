@@ -77,7 +77,11 @@ def wit_ai_response(message):
 def search_article(question):
     global article_text
     if article_text:
-        if question.lower() in article_text.lower():
+        vectorizer = TfidfVectorizer()
+        tfidf_matrix = vectorizer.fit_transform([article_text, question])
+        similarity = (tfidf_matrix[0] * tfidf_matrix[1:].T).A[0][0]
+        
+         if similarity > 0.1:
             return f"From the article: '{question}' is mentioned."
     return None
 
