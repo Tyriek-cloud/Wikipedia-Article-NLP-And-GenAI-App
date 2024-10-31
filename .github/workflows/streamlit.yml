@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -25,4 +28,5 @@ jobs:
         python -m spacy download en_core_web_sm
 
     - name: Run Streamlit app
-      run: streamlit run app.py
+      run: |
+        streamlit run app.py --server.port 8501 --server.address 0.0.0.0
