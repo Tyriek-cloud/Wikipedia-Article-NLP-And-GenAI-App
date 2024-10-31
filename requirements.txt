@@ -2,3 +2,4 @@ streamlit==1.39.0
 requests==2.31.0  
 beautifulsoup4==4.12.3     
 nltk==3.8.1 
+dotenv==16.4.5
