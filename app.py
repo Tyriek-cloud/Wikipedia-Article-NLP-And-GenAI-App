@@ -68,8 +68,18 @@ def wit_ai_response(message):
     
     if response.status_code == 200:
         data = response.json()
-        print(data)
-        # Process the response as needed, here we'll just return the message text
+        intents = data.get('intents', [])
+        entities = data.get('entities', {})
+
+         if intents:
+            intent_name = intents[0]['name']
+            return f"I understand you're asking about {intent_name}. How can I assist you further?"
+        
+        # If entities are present, include them in the response
+        if entities:
+            entity_name = next(iter(entities))  # Get the first entity
+            return f"I see you're interested in {entity_name}. Let me help you with that."
+            
         return data.get('msg', 'Sorry, I didn\'t understand that.')
     else:
         return 'Error: Could not contact Wit.ai.'
@@ -78,13 +88,17 @@ def wit_ai_response(message):
 def search_article(question):
     global article_text
     if article_text:
-        vectorizer = TfidfVectorizer()
-        tfidf_matrix = vectorizer.fit_transform([article_text, question])
-        similarity = (tfidf_matrix[0] * tfidf_matrix[1:].T).A[0][0]
+        sentences = nltk.sent_tokenize(article_text)
+        vectorizer = TfidfVectorizer().fit_transform(sentences + [question])
+        vectors = vectorizer.toarray()
+        cosine_similarities = cosine_similarity(vectors[-1], vectors[:-1])
+
+        index = cosine_similarities.argsort()[0][-1]
+        similarity_score = cosine_similarities[0][index]
         
         if similarity > 0.1:
             return f"From the article: '{question}' is mentioned."
-    return None
+    return "I'm sorry, but I couldn't find an answer in the article."
 
 # Main function
 def main():
@@ -142,6 +156,8 @@ def main():
                 # Next, the app will consult Wit.ai if no answer is found
                 response = wit_ai_response(user_question)
                 st.sidebar.write("Bot:", response)
+        else:
+            st.sidebar.write("Bot: Please ask a question about the article.")
 
 if __name__ == "__main__":
     main()
