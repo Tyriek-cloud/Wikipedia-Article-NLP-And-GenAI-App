@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
+import spacy
 
 # Download NLTK data
 nltk.download('punkt')
@@ -145,19 +146,47 @@ def main():
     # The user's method to talk to the Chatbot (Chatbot functionality)
     st.sidebar.header("Beep Boop: Talk with me")
     user_question = st.sidebar.text_input("Ask a question about the article:")
+
+    def categorize_question(question):
+    factual_keywords = ["what", "who", "when", "where", "how many", "define"]
+    general_keywords = ["opinion", "suggest", "recommend", "feel"]
+
+    question_lower = question.lower()
+    
+    if any(keyword in question_lower for keyword in factual_keywords):
+        return "factual"
+    elif any(keyword in question_lower for keyword in general_keywords):
+        return "general"
+    else:
+        return "other"
     
     if st.sidebar.button("Get Response"):
         if user_question:
-            # First, the app will search the article for an answer
+            question_type = categorize_question(user_question)
+        
+        if question_type == "factual":
             answer = search_article(user_question)
             if answer:
                 st.sidebar.write("Bot:", answer)
             else:
-                # Next, the app will consult Wit.ai if no answer is found
                 response = wit_ai_response(user_question)
                 st.sidebar.write("Bot:", response)
+        elif question_type == "general":
+            response = wit_ai_response(user_question)
+            st.sidebar.write("Bot:", response)
         else:
-            st.sidebar.write("Bot: Please ask a question about the article.")
+            st.sidebar.write("Bot: I couldn't categorize your question. Please ask something specific.")
+        #if user_question:
+            # First, the app will search the article for an answer
+         #   answer = search_article(user_question)
+          #  if answer:
+                st.sidebar.write("Bot:", answer)
+          #  else:
+                # Next, the app will consult Wit.ai if no answer is found
+           #     response = wit_ai_response(user_question)
+            #    st.sidebar.write("Bot:", response)
+      #  else:
+        #    st.sidebar.write("Bot: Please ask a question about the article.")
 
 if __name__ == "__main__":
     main()
