@@ -69,6 +69,7 @@ def search_article(question):
         vectors = vectorizer.toarray()
         cosine_similarities = cosine_similarity(vectors[-1], vectors[:-1])
 
+        top_n = 3
         index = cosine_similarities.argsort()[0][-1]
         similarity_score = cosine_similarities[0][index]
         
