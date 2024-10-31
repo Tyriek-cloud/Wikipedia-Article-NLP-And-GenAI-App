@@ -25,13 +25,11 @@ def extract_live_urls(url):
 
     references_section = soup.find("span", {"id": "References"})
     if references_section:
-        references = references_section.find_next("ul")
-        if references:
-            # urls = [a['href'] for a in references.find_all('a', href=True)]
-            references_list = references_section.find_next(["ol", "ul"])
-            if references_list:
-                urls = [urljoin(url, a['href']) for a in references.find_all('a', href=True)]
-                return urls
+        references_list = references_section.find_next(["ol", "ul"])
+        # urls = [a['href'] for a in references.find_all('a', href=True)]
+        if references_list:
+            urls = [urljoin(url, a['href']) for a in references_list.find_all('a', href=True)]
+            return urls
 
     return []
 
