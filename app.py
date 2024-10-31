@@ -148,17 +148,17 @@ def main():
     user_question = st.sidebar.text_input("Ask a question about the article:")
 
     def categorize_question(question):
-    factual_keywords = ["what", "who", "when", "where", "how many", "define"]
-    general_keywords = ["opinion", "suggest", "recommend", "feel"]
+        factual_keywords = ["what", "who", "when", "where", "how many", "define"]
+        general_keywords = ["opinion", "suggest", "recommend", "feel"]
 
-    question_lower = question.lower()
+        question_lower = question.lower()
     
-    if any(keyword in question_lower for keyword in factual_keywords):
-        return "factual"
-    elif any(keyword in question_lower for keyword in general_keywords):
-        return "general"
-    else:
-        return "other"
+        if any(keyword in question_lower for keyword in factual_keywords):
+            return "factual"
+        elif any(keyword in question_lower for keyword in general_keywords):
+            return "general"
+        else:
+            return "other"
     
     if st.sidebar.button("Get Response"):
         if user_question:
