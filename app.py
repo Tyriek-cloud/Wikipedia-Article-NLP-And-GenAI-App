@@ -5,8 +5,6 @@ from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
 from nltk.corpus import stopwords
-from dotenv import load_dotenv
-import os
 import heapq
 
 # Download NLTK data
@@ -29,7 +27,7 @@ def extract_live_urls(url):
 
     references_section = soup.find("span", {"id": "References"})
     if references_section:
-        references = references_section.find_next("ul")
+        references = references_section.find_next("ol")
         if references:
             urls = [a['href'] for a in references.find_all('a', href=True)]
             return urls
