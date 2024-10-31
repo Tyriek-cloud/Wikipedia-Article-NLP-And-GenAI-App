@@ -103,8 +103,8 @@ def main():
         image_urls = extract_images(url_input)
         st.subheader("Image URLs:")
         for idx, url in enumerate(image_urls, start=1):
-            # st.write(url)
             st.image(url, caption=f"Image {idx}", use_column_width=True)
+            st.write(url)
             
     # The user's method to talk to the Chatbot (Chatbot functionality)
     st.sidebar.header("Beep Boop: Talk with me")
