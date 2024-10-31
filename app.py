@@ -45,7 +45,7 @@ def extract_images(url):
 
 # Call Function to communicate with my Wit.ai app
 def wit_ai_response(message):
-    access_token = ''
+    access_token = 'WIT_AI_ACCESS_TOKEN'
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
