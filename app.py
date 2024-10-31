@@ -29,7 +29,7 @@ def extract_live_urls(url):
         if references:
             urls = [a['href'] for a in references.find_all('a', href=True)]
             return urls
-    print("No references found.")
+
     return []
 
 # Extracts images
