@@ -51,8 +51,8 @@ def extract_images(url):
 # Call Function to communicate with my Wit.ai app
 def wit_ai_response(message):
     # access_token = os.getenv('WIT_AI_ACCESS_TOKEN')
-    token = st.secrets["wit"]["QDG4IKACZ7H7UKCLOJQJZQ4MVPXXTURM"]
-    if not token:
+    access_token = st.secrets["wit"]["QDG4IKACZ7H7UKCLOJQJZQ4MVPXXTURM"]
+    if not access_token:
         return 'Error: Access token is not set.'
     headers = {
         'Authorization': f'Bearer {access_token}'
