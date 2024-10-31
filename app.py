@@ -28,8 +28,10 @@ def extract_live_urls(url):
         references = references_section.find_next("ul")
         if references:
             # urls = [a['href'] for a in references.find_all('a', href=True)]
-            urls = [urljoin(url, a['href']) for a in references.find_all('a', href=True)]
-            return urls
+            references_list = references_section.find_next(["ol", "ul"])
+            if references_list:
+                urls = [urljoin(url, a['href']) for a in references.find_all('a', href=True)]
+                return urls
 
     return []
 
