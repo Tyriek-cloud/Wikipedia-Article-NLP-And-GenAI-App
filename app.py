@@ -9,11 +9,12 @@ from dotenv import load_dotenv
 import os
 import heapq
 
-# Loading any necessary environment variables from .env file
-load_dotenv()
-
 # Download NLTK data
 nltk.download('punkt')
+
+# Global variable to hold the article text
+# Going to use this to help the bot search an article in real time
+article_text = ""
 
 # Summarize text
 def summarize_text(text, num_sentences=10):
@@ -43,14 +44,13 @@ def extract_images(url):
     # All image tags are called 'img'
     img_tags = soup.find_all('img')
 
-    # Extracts image URLs
-    image_urls = [urljoin(url, img['src']) for img in img_tags]
+    # Extracts image URLs (if available)
+    image_urls = [urljoin(url, img['src']) for img in img_tags if img.has_attr('src')]
 
     return image_urls
 
 # Call Function to communicate with my Wit.ai app
 def wit_ai_response(message):
-    # access_token = os.getenv('WIT_AI_ACCESS_TOKEN')
     access_token = st.secrets["wit"]["access_token"]
     if not access_token:
         return 'Error: Access token is not set.'
@@ -71,6 +71,14 @@ def wit_ai_response(message):
     else:
         return 'Error: Could not contact Wit.ai.'
 
+# This is the function that parses the article to answer the user's question
+def search_article(question):
+    global article_text
+    if article_text:
+        if question.lower() in article_text.lower():
+            return f"From the article: '{question}' is mentioned."
+    return None
+
 # Main function
 def main():
     st.title("Wikipedia Article Analyzer")
@@ -81,30 +89,36 @@ def main():
 
     # Main content
     if st.button("Analyze"):
-        # Extract and summarize the text
-        response = requests.get(url_input)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        content = soup.find("div", class_="mw-parser-output")
-        paragraphs = content.find_all("p")
-        full_text = "\n".join([p.text for p in paragraphs])
-        summary = summarize_text(full_text)
+        global article_text  # Global variable to hold the article info
+        try:
+            # Extract and summarize the text
+            response = requests.get(url_input)
+            response.raise_for_status() # Bad responses
+            soup = BeautifulSoup(response.text, 'html.parser')
+            content = soup.find("div", class_="mw-parser-output")
+            paragraphs = content.find_all("p")
+            full_text = "\n".join([p.text for p in paragraphs])
+            summary = summarize_text(article_text)
 
-        # Display summary
-        st.subheader("Summary:")
-        st.write(summary)
+            # Display summary
+            st.subheader("Summary:")
+            st.write(summary)
 
-        # Extract live URLs from the references section
-        live_urls = extract_live_urls(url_input)
-        st.subheader("Live URLs from References:")
-        for url in live_urls:
-            st.write(url)
+            # Extract live URLs from the references section
+            live_urls = extract_live_urls(url_input)
+            st.subheader("Live URLs from References:")
+            for url in live_urls:
+                st.write(url)
 
-        # Extract images
-        image_urls = extract_images(url_input)
-        st.subheader("Image URLs:")
-        for idx, url in enumerate(image_urls, start=1):
-            st.image(url, caption=f"Image {idx}", use_column_width=True)
-            st.write(url)
+            # Extract images
+            image_urls = extract_images(url_input)
+            st.subheader("Image URLs:")
+            for idx, url in enumerate(image_urls, start=1):
+                st.image(url, caption=f"Image {idx}", use_column_width=True)
+                st.write(url)
+
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
             
     # The user's method to talk to the Chatbot (Chatbot functionality)
     st.sidebar.header("Beep Boop: Talk with me")
@@ -112,8 +126,14 @@ def main():
     
     if st.sidebar.button("Get Response"):
         if user_question:
-            response = wit_ai_response(user_question)
-            st.sidebar.write("Bot:", response)
+            # First, the app will search the article for an answer
+            answer = search_article(user_question)
+            if answer:
+                st.sidebar.write("Bot:", answer)
+            else:
+                # Next, the app will consult Wit.ai if no answer is found
+                response = wit_ai_response(user_question)
+                st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
     main()
