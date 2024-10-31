@@ -1,18 +1,15 @@
-# Now to define the Streamlit app
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
-import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Download NLTK data
+# Download NLTK data (you might want to do this once)
 nltk.download('punkt')
-
-# Load SpaCy model
-nlp = spacy.load("en_core_web_sm")
+nltk.download('averaged_perceptron_tagger')  # For POS tagging
+nltk.download('named_entities')  # For named entity recognition
 
 # Global variable to hold the article text
 article_text = ""
@@ -94,11 +91,19 @@ def categorize_question(question):
     else:
         return "other"
 
-# Analyze the question for entities
+# Analyze the question for entities using NLTK
 def analyze_question(question):
-    doc = nlp(question)
-    entities = [(ent.text, ent.label_) for ent in doc.ents]
-    noun_phrases = list(doc.noun_chunks)
+    tokens = nltk.word_tokenize(question)
+    pos_tags = nltk.pos_tag(tokens)
+    named_entities = nltk.ne_chunk(pos_tags, binary=True)  # Binary flag for named entity recognition
+    entities = []
+    
+    for subtree in named_entities:
+        if hasattr(subtree, 'label'):
+            entity = ' '.join([leaf[0] for leaf in subtree.leaves()])
+            entities.append((entity, subtree.label()))
+
+    noun_phrases = [' '.join([token for token, tag in pos_tags if tag.startswith('NN')])]
     return entities, noun_phrases
 
 # Main function
