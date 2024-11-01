@@ -6,9 +6,9 @@ Wikipedia Article Analyzer: https://wikipedia-article-analyzer-nlp-app-app-ggh9s
 
 This project is designed to scrape articles from Wikipedia. By default, the Streamlit application will display the Wikipedia Statistics page (https://en.wikipedia.org/wiki/Statistics). The user will have the option to insert their own Wikipedia URLs. The end goal is to use Natural Language Processing to create a summary (with an emphasis on important and easily digestable details) from Wikipedia articles and display important images/pictures/graphics from each of the articles.
 
-The user can now also interact with a ChatBot. The ChatBot is currently a work-in progress. The ChatBot is being trained by the app's internal Natural Language Processing model and an external LLM (Wit.AI). The app's author will be continuously training the external LLM to produce better results.
+The user can now also interact with a Chatbot. The Chatbot is currently a work-in progress. The Chatbot is being trained by the app's internal Natural Language Processing model and an external LLM (Wit.AI). The app's author will be continuously training the external LLM to produce better results.
 
-# Example Questions to ask the ChatBot
+# Example Questions to ask the Chatbot
 
 To help train the model, the app's author has introduced a dictionary of two example questions:
 - "what is statistics?"
@@ -32,4 +32,4 @@ The base code for this app was written in Google Colab: https://colab.research.g
 
 So I researched solutions to modify the tokenization and other features of the application.
 
-The ChatBot is currently a work-in-progress. It will be improved over time.
+The Chatbot is currently a work-in-progress. It will be improved over time.
