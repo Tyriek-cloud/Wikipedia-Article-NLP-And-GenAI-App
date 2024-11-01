@@ -1,4 +1,4 @@
-# Wikipedia-Article-Analyzer-NLP-Streamlit-App
+# Wikipedia-Article-Analyzer-And-Chatbot
 
 Wikipedia Article Analyzer: https://wikipedia-article-analyzer-nlp-app-app-ggh9suyycuva5j6wybe5pa.streamlit.app/
 
