@@ -1,4 +1,5 @@
 # Wikipedia-Article-Analyzer-NLP-Streamlit-App
+
 Wikipedia Article Analyzer: https://wikipedia-article-analyzer-nlp-app-app-ggh9suyycuva5j6wybe5pa.streamlit.app/
 
 ![image](https://github.com/Tyriek-cloud/Wikipedia-Article-Analyzer-NLP-Streamlit-App/assets/62261407/de187679-b57b-4faa-9928-f4e316a25652)
@@ -8,6 +9,7 @@ This project is designed to scrape articles from Wikipedia. By default, the Stre
 The user can now also interact with a ChatBot. The ChatBot is currently a work-in progress. The ChatBot is being trained by the app's internal Natural Language Processing model and an external LLM (Wit.AI). The app's author will be continuously training the external LLM to produce better results.
 
 # Example Questions to ask the ChatBot
+
 To help train the model, the app's author has introduced a dictionary of two example questions:
 - "what is statistics?"
 - "what is machine learning?"
@@ -15,6 +17,8 @@ To help train the model, the app's author has introduced a dictionary of two exa
 # Summary
 
 The application generates a summary of 10+ sentences. The sentences are intended to pull crucial facts about the article. As opposed to reading an entire article, this can save a user time.
+
+The user may also ask questions about the Wikipedia article that was analyzed. Be sure to hit the "Analyze" button before trying to ask a question. This will ensure that the app webscrapes the relevant Wikipedia article.
 
 # Image URLs
 
