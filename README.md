@@ -9,8 +9,8 @@ The user can now also interact with a ChatBot. The ChatBot is currently a work-i
 
 # Example Questions to ask the ChatBot
 To help train the model, the app's author has introduced a dictionary of two example questions:
-"what is statistics?"
-"what is machine learning?"
+- "what is statistics?"
+- "what is machine learning?"
 
 # Summary
 
