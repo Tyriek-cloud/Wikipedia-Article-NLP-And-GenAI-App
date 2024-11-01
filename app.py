@@ -6,13 +6,17 @@ from urllib.parse import urljoin
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Download NLTK data (you might want to do this once)
+# Download NLTK data
 nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')  # For POS tagging
-nltk.download('named_entities')  # For named entity recognition
 
 # Global variable to hold the article text
 article_text = ""
+
+# Simple FAQ dictionary
+faq = {
+    "what is statistics?": "Statistics is the study of data: how to collect, summarize and interpret it.",
+    "what is machine learning?": "Machine learning is a field of artificial intelligence that uses statistical techniques to give computer systems the ability to learn from data.",
+}
 
 # Summarize text
 def summarize_text(text, num_sentences=10):
@@ -28,38 +32,6 @@ def extract_images(url):
     image_urls = [urljoin(url, img['src']) for img in img_tags if img.has_attr('src')]
     return image_urls
 
-# Call Function to communicate with Wit.ai app
-def wit_ai_response(message):
-    access_token = st.secrets["wit"]["access_token"]
-    if not access_token:
-        return 'Error: Access token is not set.'
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
-    params = {
-        'v': '20220217',  # API version date
-        'q': message
-    }
-    
-    response = requests.get('https://api.wit.ai/message', headers=headers, params=params)
-    
-    if response.status_code == 200:
-        data = response.json()
-        intents = data.get('intents', [])
-        entities = data.get('entities', {})
-
-        if intents:
-            intent_name = intents[0]['name']
-            return f"I understand you're asking about {intent_name}. How can I assist you further?"
-        
-        if entities:
-            entity_name = next(iter(entities))  # Get the first entity
-            return f"I see you're interested in {entity_name}. Let me help you with that."
-            
-        return data.get('msg', 'Sorry, I didn\'t understand that.')
-    else:
-        return 'Error: Could not contact Wit.ai.'
-
 # This is the function that parses the article to answer the user's question
 def search_article(question):
     global article_text
@@ -69,19 +41,25 @@ def search_article(question):
         vectors = vectorizer.toarray()
         cosine_similarities = cosine_similarity(vectors[-1], vectors[:-1])
 
-        top_n = 3
-        index = cosine_similarities.argsort()[0][-1]
-        similarity_score = cosine_similarities[0][index]
-        
-        if similarity_score > 0.1:
-            return f"From the article: '{sentences[index]}'"
-    
+        # Get the top N sentences
+        top_n = 3  # Number of responses you want
+        indices = cosine_similarities.argsort()[0][-top_n:][::-1]
+        responses = []
+
+        for index in indices:
+            similarity_score = cosine_similarities[0][index]
+            if similarity_score > 0.1:  # Adjust threshold as needed
+                responses.append(f"From the article: '{sentences[index]}'")
+
+        if responses:
+            return "\n".join(responses)
+
     return "I'm sorry, but I couldn't find an answer in the article."
 
 # Categorize the user's question
 def categorize_question(question):
-    factual_keywords = ["what", "who", "when", "where", "how many", "define"]
-    general_keywords = ["opinion", "suggest", "recommend", "feel"]
+    factual_keywords = ["what", "who", "when", "where", "how many", "define", "which", "why"]
+    general_keywords = ["opinion", "suggest", "recommend", "feel", "think", "believe"]
 
     question_lower = question.lower()
     
@@ -92,20 +70,25 @@ def categorize_question(question):
     else:
         return "other"
 
-# Analyze the question for entities using NLTK
-def analyze_question(question):
-    tokens = nltk.word_tokenize(question)
-    pos_tags = nltk.pos_tag(tokens)
-    named_entities = nltk.ne_chunk(pos_tags, binary=True)  # Binary flag for named entity recognition
-    entities = []
-    
-    for subtree in named_entities:
-        if hasattr(subtree, 'label'):
-            entity = ' '.join([leaf[0] for leaf in subtree.leaves()])
-            entities.append((entity, subtree.label()))
+# Handle user question
+def handle_user_question(user_question):
+    # Normalize the question to improve matching
+    normalized_question = user_question.lower().strip()
 
-    noun_phrases = [' '.join([token for token, tag in pos_tags if tag.startswith('NN')])]
-    return entities, noun_phrases
+    # Check if the question is in the FAQ
+    if normalized_question in faq:
+        return faq[normalized_question]
+
+    # Proceed with the existing logic if not found in FAQ
+    question_type = categorize_question(user_question)
+    
+    if question_type == "factual":
+        return search_article(user_question)
+    elif question_type == "general":
+        # Replace this with your Wit.ai call if needed
+        return "I'm currently unable to process general inquiries. Please ask a factual question."
+    else:
+        return "I couldn't categorize your question. Please ask something specific."
 
 # Main function
 def main():
@@ -145,21 +128,8 @@ def main():
     user_question = st.sidebar.text_input("Ask a question about the article:")
 
     if user_question:
-        question_type = categorize_question(user_question)
-        
-        if question_type == "factual":
-            answer = search_article(user_question)
-            st.sidebar.write("Bot:", answer)
-        elif question_type == "general":
-            response = wit_ai_response(user_question)
-            st.sidebar.write("Bot:", response)
-        else:
-            st.sidebar.write("Bot: I couldn't categorize your question. Please ask something specific.")
-
-        # Analyze question for entities
-        entities, noun_phrases = analyze_question(user_question)
-        if entities:
-            st.sidebar.write("Bot: I found these entities in your question:", entities)
+        response = handle_user_question(user_question)
+        st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
     main()
