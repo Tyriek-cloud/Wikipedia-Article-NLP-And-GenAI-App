@@ -8,6 +8,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 import os
 from fuzzywuzzy import process
 from transformers import pipeline
+from PIL import Image
+from io import BytesIO
 
 # Download NLTK data
 nltk.download('punkt')
@@ -16,9 +18,7 @@ nltk.download('punkt')
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased")
 generator = pipeline("text-generation", model="tiiuae/falcon-40b-instruct")
 
-# Global variables to store information
-# The article_text variable stores the parsed article text
-# The conversation_history variable stores the history of the user's textual responses when talking to the ChatBot
+# Global variables
 article_text = ""
 conversation_history = []
 
@@ -28,11 +28,12 @@ faq = {
     "what is machine learning?": "Machine learning is a field of artificial intelligence that uses statistical techniques to give computer systems the ability to learn from data.",
 }
 
-# Add Hugging Face API token (for Falcon-40B-Instruct)
+# Add Hugging Face API token (for Falcon-40B-Instruct and Image Generation)
 HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
+IMAGE_GEN_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
 
 # Helper function to query Falcon-40B-Instruct for general questions
 def query_falcon_model(question):
@@ -114,6 +115,25 @@ def handle_user_question(user_question):
     # If it's a general question, ask Falcon-40B-Instruct
     return query_falcon_model(user_question)
 
+# Generate an image from a prompt using Hugging Face's Stable Diffusion
+def generate_image(prompt):
+    headers = {
+        "Authorization": f"Bearer {HF_API_TOKEN}",
+        "Content-Type": "application/json",
+    }
+
+    # Request the image generation
+    response = requests.post(IMAGE_GEN_URL, headers=headers, json={"inputs": prompt})
+
+    if response.status_code == 200:
+        # Extract image URL from the response
+        image_url = response.json()[0]["url"]
+        image_response = requests.get(image_url)
+        img = Image.open(BytesIO(image_response.content))
+        return img
+    else:
+        return None
+
 # Save conversation history for context
 def append_to_history(user_question, bot_answer):
     conversation_history.append({
@@ -121,7 +141,6 @@ def append_to_history(user_question, bot_answer):
         "bot": bot_answer
     })
 
-# Here is how the app is grabbing the conversation history (as mentioned briefly above)
 def get_conversation_history():
     return " ".join([f"User: {item['user']} Bot: {item['bot']}" for item in conversation_history])
 
@@ -169,6 +188,18 @@ def main():
 
         # Save the conversation history for context in future responses
         append_to_history(user_question, response)
+
+    # Image Generation Feature
+    st.sidebar.header("Image Generation")
+    image_prompt = st.sidebar.text_input("Enter a prompt to generate an image:")
+
+    if image_prompt:
+        st.sidebar.write(f"Generating image for prompt: {image_prompt}...")
+        image = generate_image(image_prompt)
+        if image:
+            st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
+        else:
+            st.sidebar.write("Sorry, there was an error generating the image.")
 
 if __name__ == "__main__":
     main()
