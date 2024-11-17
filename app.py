@@ -148,6 +148,37 @@ def append_to_history(user_question, bot_answer):
 def get_conversation_history():
     return " ".join([f"User: {item['user']} Bot: {item['bot']}" for item in conversation_history])
 
+# This is the function that parses the article to answer the user's question
+def search_article(question):
+    global article_text
+    if article_text:
+        sentences = nltk.sent_tokenize(article_text)
+        all_sentences = sentences + [question]  # Add the user's question to the list of sentences
+
+        # Ensure the input is a list of strings (2D array)
+        vectorizer = TfidfVectorizer().fit_transform(all_sentences)
+
+        # Convert the result to an array (2D)
+        vectors = vectorizer.toarray()
+
+        # Calculate cosine similarities
+        cosine_similarities = cosine_similarity(vectors[-1:], vectors[:-1])  # Compare the last vector (the question) with the others
+
+        # Get the top N sentences (with the highest similarity scores)
+        top_n = 3
+        indices = cosine_similarities.argsort()[0][-top_n:][::-1]
+
+        responses = []
+        for index in indices:
+            similarity_score = cosine_similarities[0][index]
+            if similarity_score > 0.1:  # You can adjust this threshold
+                responses.append(f"From the article: '{sentences[index]}'")
+
+        if responses:
+            return "\n".join(responses)
+
+    return "Sorry, I couldn't find a relevant answer in the article."
+
 # Main function
 def main():
     st.title("Wikipedia Article Analyzer")
