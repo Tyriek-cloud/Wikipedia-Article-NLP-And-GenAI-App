@@ -183,8 +183,8 @@ def main():
                 st.error(f"Error: {str(e)}")
 
     # User's method to talk to the chatbot
-    #st.sidebar.header("Beep Boop: Talk with me")
-    #user_question = st.sidebar.text_input("Ask a question:")
+    st.sidebar.header("Beep Boop: Talk with me")
+    user_question = st.sidebar.text_input("Ask a question:")
 
     if user_question:
         response = handle_user_question(user_question)
