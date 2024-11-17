@@ -5,6 +5,7 @@ import nltk
 from urllib.parse import urljoin
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import os
 
 # Download NLTK data
 nltk.download('punkt')
@@ -19,7 +20,9 @@ faq = {
 }
 
 # Add Hugging Face API token
-HF_API_TOKEN = "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"
+HF_API_TOKEN = os.getenv('NOTIMPORTANT')
+if not HF_API_TOKEN:
+    raise ValueError("Hugging Face API token is missing!")
 HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
 
 # Helper function to query Falcon-40B-Instruct via Hugging Face API
