@@ -1,9 +1,35 @@
 name: Streamlit App
 
+sdk: streamlit
+
 on:
   push:
     branches:
       - main
+
+image: "python:3.9"
+
+dependencies:
+  - pip
+  - python-dotenv
+  - nltk
+  - requests
+  - beautifulsoup4
+  - spacy
+  - scikit-learn
+  - fuzzywuzzy
+  - transformers
+  - Pillow
+  - torch>=2.0.0
+  - numpy>=1.20,<2.1.0
+  - streamlit>=1.0
+
+# Build steps for preparing the app
+build:
+  commands:
+    - pip install -r requirements.txt 
+    - pip install --upgrade pip setuptools wheel
+    - python -m nltk.downloader punkt
 
 jobs:
   build:
@@ -22,11 +48,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install --upgrade pip
-
-    - name: Download spaCy model
-      run: |
-        python -m spacy download en_core_web_sm
+        pip install --upgrade pip  # Not really needed twice, but kept for safety
 
     - name: Run Streamlit app
       run: |
