@@ -20,7 +20,7 @@ faq = {
 }
 
 # Add Hugging Face API token
-HF_API_TOKEN = os.getenv('NOTIMPORTANT')
+HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
