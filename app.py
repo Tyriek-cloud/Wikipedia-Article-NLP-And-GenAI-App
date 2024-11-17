@@ -32,19 +32,20 @@ def query_falcon_model(question, context=None):
         "Content-Type": "application/json",
     }
 
-    # If context (the article) is available, include it in the input
+    inputs = {"inputs": question}
     if context:
-        inputs = f"Context: {context}\nQuestion: {question}"
-    else:
-        inputs = question
+        inputs["parameters"] = {"context": context}
 
-    response = requests.post(HF_API_URL, headers=headers, json={"inputs": inputs})
-    
+    response = requests.post(HF_API_URL, headers=headers, json=inputs)
+
     if response.status_code == 200:
-        answer = response.json()[0]['generated_text']
-        return answer
+        result = response.json()
+        if 'generated_text' in result[0]:
+            return result[0]['generated_text']
+        else:
+            return "Sorry, the model didn't return a valid response."
     else:
-        return "Sorry, there was an error processing your question."
+        return f"Error: {response.status_code} - {response.text}"
         
 # Summarize text
 def summarize_text(text, num_sentences=10):
@@ -144,10 +145,7 @@ def main():
                 paragraphs = content.find_all("p")
                 full_text = "\n".join([p.text for p in paragraphs])
                 article_text = full_text
-                
-                # Debugging: Check article_text content
-                st.write(f"Article content length: {len(article_text)}")
-                st.write(f"Article content (first 500 characters): {article_text[:500]}...")
+                summary = summarize_text(full_text)
 
                 st.subheader("Summary:")
                 st.write(summary)
