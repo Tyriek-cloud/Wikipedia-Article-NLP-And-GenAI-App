@@ -10,11 +10,12 @@ from fuzzywuzzy import process
 from transformers import pipeline
 from PIL import Image
 from io import BytesIO
+import time
 
 # Download NLTK data
 nltk.download('punkt')
 
-# Initialize Hugging Face pipelines
+# Initialize Hugging Face pipelines (keeping these models cached)
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased", framework="pt")
 generator = pipeline("text-generation", model="tiiuae/falcon-40b-instruct")
 
@@ -35,6 +36,33 @@ if not HF_API_TOKEN:
 
 HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
 IMAGE_GEN_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
+
+# Cache heavy operations like article fetching and image generation
+@st.cache_data
+def fetch_article(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'html.parser')
+    content = soup.find("div", class_="mw-parser-output")
+    paragraphs = content.find_all("p")
+    return "\n".join([p.text for p in paragraphs])
+
+@st.cache_resource
+def generate_image_cached(prompt, hf_api_token):
+    headers = {
+        "Authorization": f"Bearer {hf_api_token}",
+        "Content-Type": "application/json",
+    }
+    response = requests.post(IMAGE_GEN_URL, headers=headers, json={"inputs": prompt})
+
+    if response.status_code == 200:
+        image_url = response.json()[0]["url"]
+        image_response = requests.get(image_url)
+        img = Image.open(BytesIO(image_response.content))
+        return img
+    else:
+        st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
+        return None
 
 # Helper function to query Falcon-40B-Instruct for general questions
 def query_falcon_model(question):
@@ -116,26 +144,6 @@ def handle_user_question(user_question):
     # If it's a general question, ask Falcon-40B-Instruct
     return query_falcon_model(user_question)
 
-# Generate an image from a prompt using Hugging Face's Stable Diffusion
-def generate_image(prompt):
-    headers = {
-        "Authorization": f"Bearer {HF_API_TOKEN}",
-        "Content-Type": "application/json",
-    }
-
-    # Request the image generation
-    response = requests.post(IMAGE_GEN_URL, headers=headers, json={"inputs": prompt})
-
-    if response.status_code == 200:
-        # Extract image URL from the response
-        image_url = response.json()[0]["url"]
-        image_response = requests.get(image_url)
-        img = Image.open(BytesIO(image_response.content))
-        return img
-    else:
-        st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
-        return None
-
 # Save conversation history for context
 def append_to_history(user_question, bot_answer):
     conversation_history.append({
@@ -162,14 +170,8 @@ def main():
         if st.button("Analyze"):
             global article_text
             try:
-                response = requests.get(url_input)
-                response.raise_for_status()
-                soup = BeautifulSoup(response.text, 'html.parser')
-                content = soup.find("div", class_="mw-parser-output")
-                paragraphs = content.find_all("p")
-                full_text = "\n".join([p.text for p in paragraphs])
-                article_text = full_text
-                summary = summarize_text(full_text)
+                article_text = fetch_article(url_input)  # Fetch article with caching
+                summary = summarize_text(article_text)
 
                 st.subheader("Summary:")
                 st.write(summary)
@@ -188,23 +190,24 @@ def main():
     user_question = st.sidebar.text_input("Ask a question:")
 
     if user_question:
-        response = handle_user_question(user_question)
-        st.sidebar.write("Bot:", response)
+        with st.spinner("Processing your question..."):
+            response = handle_user_question(user_question)
+            st.sidebar.write("Bot:", response)
 
-        # Save the conversation history for context in future responses
-        append_to_history(user_question, response)
+            # Save the conversation history for context in future responses
+            append_to_history(user_question, response)
 
     # User's method to generate images (Move this to a separate section in the sidebar)
     st.sidebar.header("Image Generation")
     image_prompt = st.sidebar.text_input("Enter a prompt to generate an image:")
 
     if image_prompt:
-        st.sidebar.write(f"Generating image for prompt: {image_prompt}...")
-        image = generate_image(image_prompt)
-        if image:
-            st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
-        else:
-            st.sidebar.write("Sorry, there was an error generating the image.")
+        with st.spinner("Generating image..."):
+            image = generate_image_cached(image_prompt, HF_API_TOKEN)
+            if image:
+                st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
+            else:
+                st.sidebar.write("Sorry, there was an error generating the image.")
 
 if __name__ == "__main__":
     main()
