@@ -48,7 +48,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install --upgrade pip  # Not really needed twice, but kept for safety
 
     - name: Run Streamlit app
       run: |
