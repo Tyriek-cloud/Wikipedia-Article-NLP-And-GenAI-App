@@ -18,6 +18,30 @@ faq = {
     "what is machine learning?": "Machine learning is a field of artificial intelligence that uses statistical techniques to give computer systems the ability to learn from data.",
 }
 
+# Add Hugging Face API token
+HF_API_TOKEN = "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"
+HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
+
+# Helper function to query Falcon-40B-Instruct via Hugging Face API
+def query_falcon_model(question, context=None):
+    headers = {
+        "Authorization": f"Bearer {HF_API_TOKEN}",
+        "Content-Type": "application/json",
+    }
+
+    # If context (the article) is available, include it in the input
+    inputs = {"inputs": question}
+    if context:
+        inputs["parameters"] = {"context": context}
+
+    response = requests.post(HF_API_URL, headers=headers, json=inputs)
+    
+    if response.status_code == 200:
+        answer = response.json()[0]['generated_text']
+        return answer
+    else:
+        return "Sorry, there was an error processing your question."
+        
 # Summarize text
 def summarize_text(text, num_sentences=10):
     sentences = nltk.sent_tokenize(text)
