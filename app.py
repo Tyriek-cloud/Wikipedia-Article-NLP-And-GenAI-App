@@ -6,7 +6,6 @@ from urllib.parse import urljoin
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import os
-from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Download NLTK data
 nltk.download('punkt')
@@ -118,7 +117,7 @@ def handle_user_question(user_question):
     question_type = categorize_question(user_question)
     
     if question_type == "factual":
-        return search_article(user_question)
+        return query_falcon_model(user_question, context=article_text)
     elif question_type == "general":
         # Replace this with your Wit.ai call if needed
         return "I'm currently unable to process general inquiries. Please ask a factual question."
@@ -164,7 +163,8 @@ def main():
     user_question = st.sidebar.text_input("Ask a question about the article:")
 
     if user_question:
-        response = handle_user_question(user_question)
+        with st.spinner('Thinking...'):
+            response = handle_user_question(user_question)
         st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
