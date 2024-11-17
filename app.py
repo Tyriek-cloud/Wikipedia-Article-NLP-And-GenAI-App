@@ -20,32 +20,26 @@ faq = {
 }
 
 # Add Hugging Face API token
-HF_API_TOKEN = os.getenv('NOTIMPORTANT')
+HF_API_TOKEN = os.getenv('HF_API_TOKEN')
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
 
-# Helper function to query Falcon-40B-Instruct via Hugging Face API
-def query_falcon_model(question, context=None):
+# Helper function to query Falcon-40B-Instruct via Hugging Face API for general questions
+def query_falcon_model(question):
     headers = {
         "Authorization": f"Bearer {HF_API_TOKEN}",
         "Content-Type": "application/json",
     }
 
-    # If context (the article) is available, include it in the input
-    if context:
-        inputs = f"Context: {context}\nQuestion: {question}"
-    else:
-        inputs = question
+    response = requests.post(HF_API_URL, headers=headers, json={"inputs": question})
 
-    response = requests.post(HF_API_URL, headers=headers, json={"inputs": inputs})
-    
     if response.status_code == 200:
         answer = response.json()[0]['generated_text']
         return answer
     else:
-        return "Sorry, there was an error processing your question."
-        
+        return f"Sorry, there was an error: {response.status_code}"
+
 # Summarize text
 def summarize_text(text, num_sentences=10):
     sentences = nltk.sent_tokenize(text)
@@ -98,31 +92,22 @@ def categorize_question(question):
     else:
         return "other"
 
-# Handle user question
+# Handle user question (now supports both article and general questions)
 def handle_user_question(user_question):
-    # Normalize the question to improve matching
     normalized_question = user_question.lower().strip()
 
     # Check if the question is in the FAQ
     if normalized_question in faq:
         return faq[normalized_question]
 
-    # Query the Falcon model if it's not a FAQ question
+    # If article text is available, try searching for an answer in the article
     if article_text:
-        return query_falcon_model(user_question, context=article_text)
-    else:
-        return "I couldn't find an article to process your question."
-
-    # Proceed with the existing logic if not found in FAQ or Falcon
-    question_type = categorize_question(user_question)
+        article_response = search_article(user_question)
+        if article_response != "I'm sorry, but I couldn't find an answer in the article.":
+            return article_response
     
-    if question_type == "factual":
-        return query_falcon_model(user_question, context=article_text)
-    elif question_type == "general":
-        # Replace this with your Wit.ai call if needed
-        return "I'm currently unable to process general inquiries. Please ask a factual question."
-    else:
-        return "I couldn't categorize your question. Please ask something specific."
+    # If the question is general, ask Falcon-40B-Instruct
+    return query_falcon_model(user_question)
 
 # Main function
 def main():
@@ -160,11 +145,10 @@ def main():
 
     # User's method to talk to the chatbot
     st.sidebar.header("Beep Boop: Talk with me")
-    user_question = st.sidebar.text_input("Ask a question about the article:")
+    user_question = st.sidebar.text_input("Ask a question:")
 
     if user_question:
-        with st.spinner('Thinking...'):
-            response = handle_user_question(user_question)
+        response = handle_user_question(user_question)
         st.sidebar.write("Bot:", response)
 
 if __name__ == "__main__":
