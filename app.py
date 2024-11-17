@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import os
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Download NLTK data
 nltk.download('punkt')
