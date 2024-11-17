@@ -29,9 +29,10 @@ faq = {
 }
 
 # Add Hugging Face API token (for Falcon-40B-Instruct and Image Generation)
-HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]
+HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Streamlit secrets for sensitive data
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
+
 HF_API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-40b-instruct"
 IMAGE_GEN_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
 
@@ -65,7 +66,7 @@ def answer_from_article(question):
 # Summarize text
 def summarize_text(text, num_sentences=10):
     sentences = nltk.sent_tokenize(text)
-    summary = " ".join(sentences[:num_sentences])
+    summary = " ".join(sentences[:num_sentences])  # Limit to the number of sentences specified
     return summary
 
 # Extract images from the article
