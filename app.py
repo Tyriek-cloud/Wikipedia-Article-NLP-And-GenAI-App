@@ -32,20 +32,19 @@ def query_falcon_model(question, context=None):
         "Content-Type": "application/json",
     }
 
-    inputs = {"inputs": question}
+    # If context (the article) is available, include it in the input
     if context:
-        inputs["parameters"] = {"context": context}
-
-    response = requests.post(HF_API_URL, headers=headers, json=inputs)
-
-    if response.status_code == 200:
-        result = response.json()
-        if 'generated_text' in result[0]:
-            return result[0]['generated_text']
-        else:
-            return "Sorry, the model didn't return a valid response."
+        inputs = f"Context: {context}\nQuestion: {question}"
     else:
-        return f"Error: {response.status_code} - {response.text}"
+        inputs = question
+
+    response = requests.post(HF_API_URL, headers=headers, json={"inputs": inputs})
+    
+    if response.status_code == 200:
+        answer = response.json()[0]['generated_text']
+        return answer
+    else:
+        return "Sorry, there was an error processing your question."
         
 # Summarize text
 def summarize_text(text, num_sentences=10):
