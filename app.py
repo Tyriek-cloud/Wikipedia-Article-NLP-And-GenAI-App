@@ -144,7 +144,10 @@ def main():
                 paragraphs = content.find_all("p")
                 full_text = "\n".join([p.text for p in paragraphs])
                 article_text = full_text
-                summary = summarize_text(full_text)
+                
+                # Debugging: Check article_text content
+                st.write(f"Article content length: {len(article_text)}")
+                st.write(f"Article content (first 500 characters): {article_text[:500]}...")
 
                 st.subheader("Summary:")
                 st.write(summary)
