@@ -5,18 +5,14 @@ import nltk
 from urllib.parse import urljoin
 from PIL import Image
 from io import BytesIO
-import time
 
 # Download NLTK data
 nltk.download('punkt')
 
-# Initialize Hugging Face pipelines (keeping these models cached)
-generator = pipeline("text-generation", model="tiiuae/falcon-40b-instruct")
-
 # Global variable for article text
 article_text = ""
 
-# Add Hugging Face API token (for Falcon-40B-Instruct and Image Generation)
+# Add Hugging Face API token (for Image Generation)
 HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Streamlit secrets for sensitive data
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
