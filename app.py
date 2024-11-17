@@ -33,11 +33,12 @@ def query_falcon_model(question, context=None):
     }
 
     # If context (the article) is available, include it in the input
-    inputs = {"inputs": question}
     if context:
-        inputs["parameters"] = {"context": context}
+        inputs = f"Context: {context}\nQuestion: {question}"
+    else:
+        inputs = question
 
-    response = requests.post(HF_API_URL, headers=headers, json=inputs)
+    response = requests.post(HF_API_URL, headers=headers, json={"inputs": inputs})
     
     if response.status_code == 200:
         answer = response.json()[0]['generated_text']
@@ -106,7 +107,13 @@ def handle_user_question(user_question):
     if normalized_question in faq:
         return faq[normalized_question]
 
-    # Proceed with the existing logic if not found in FAQ
+    # Query the Falcon model if it's not a FAQ question
+    if article_text:
+        return query_falcon_model(user_question, context=article_text)
+    else:
+        return "I couldn't find an article to process your question."
+
+    # Proceed with the existing logic if not found in FAQ or Falcon
     question_type = categorize_question(user_question)
     
     if question_type == "factual":
@@ -126,29 +133,30 @@ def main():
     url_input = st.sidebar.text_input("Enter Wikipedia URL:", "https://en.wikipedia.org/wiki/Statistics")
 
     # Main content
-    if st.button("Analyze"):
-        global article_text
-        try:
-            response = requests.get(url_input)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
-            content = soup.find("div", class_="mw-parser-output")
-            paragraphs = content.find_all("p")
-            full_text = "\n".join([p.text for p in paragraphs])
-            article_text = full_text
-            summary = summarize_text(full_text)
+    with st.spinner('Analyzing article...'):
+        if st.button("Analyze"):
+            global article_text
+            try:
+                response = requests.get(url_input)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.text, 'html.parser')
+                content = soup.find("div", class_="mw-parser-output")
+                paragraphs = content.find_all("p")
+                full_text = "\n".join([p.text for p in paragraphs])
+                article_text = full_text
+                summary = summarize_text(full_text)
 
-            st.subheader("Summary:")
-            st.write(summary)
+                st.subheader("Summary:")
+                st.write(summary)
 
-            image_urls = extract_images(url_input)
-            st.subheader("Image URLs:")
-            for idx, url in enumerate(image_urls, start=1):
-                st.image(url, caption=f"Image {idx}", use_column_width=True)
-                st.write(url)
+                image_urls = extract_images(url_input)
+                st.subheader("Image URLs:")
+                for idx, url in enumerate(image_urls, start=1):
+                    st.image(url, caption=f"Image {idx}", use_column_width=True)
+                    st.write(url)
 
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
 
     # User's method to talk to the chatbot
     st.sidebar.header("Beep Boop: Talk with me")
