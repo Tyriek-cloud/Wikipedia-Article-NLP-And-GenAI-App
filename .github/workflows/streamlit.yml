@@ -32,4 +32,4 @@ jobs:
       run: |
         streamlit run app.py --server.port 8501 --server.address 0.0.0.0
       env:
-        NOTIMPORTANT: ${{ secrets.NOTIMPORTANT }}
+        HF_API_TOKEN: ${{ secrets.HF_API_TOKEN }}
