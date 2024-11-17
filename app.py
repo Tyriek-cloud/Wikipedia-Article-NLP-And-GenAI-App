@@ -132,6 +132,7 @@ def generate_image(prompt):
         img = Image.open(BytesIO(image_response.content))
         return img
     else:
+        print(f"Error generating image: {response.status_code}, {response.text}")
         return None
 
 # Save conversation history for context
