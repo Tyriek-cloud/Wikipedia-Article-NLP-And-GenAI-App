@@ -3,7 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 import nltk
 from urllib.parse import urljoin
-from transformers import pipeline
 from PIL import Image
 from io import BytesIO
 import time
