@@ -178,17 +178,6 @@ def main():
             except Exception as e:
                 st.error(f"Error: {str(e)}")
 
-    # User's method to talk to the chatbot
-    st.sidebar.header("Beep Boop: Talk with me")
-    user_question = st.sidebar.text_input("Ask a question:")
-
-    if user_question:
-        response = handle_user_question(user_question)
-        st.sidebar.write("Bot:", response)
-
-        # Save the conversation history for context in future responses
-        append_to_history(user_question, response)
-
     # Image Generation Feature
     st.sidebar.header("Image Generation")
     image_prompt = st.sidebar.text_input("Enter a prompt to generate an image:")
