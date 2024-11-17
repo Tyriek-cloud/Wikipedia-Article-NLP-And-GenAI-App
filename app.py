@@ -15,7 +15,7 @@ from io import BytesIO
 nltk.download('punkt')
 
 # Initialize Hugging Face pipelines
-qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased")
+qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", tokenizer="distilbert-base-cased", framework="pt")
 generator = pipeline("text-generation", model="tiiuae/falcon-40b-instruct")
 
 # Global variables
