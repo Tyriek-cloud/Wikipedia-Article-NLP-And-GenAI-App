@@ -11,9 +11,6 @@ from transformers import pipeline
 from PIL import Image
 from io import BytesIO
 
-# Disabling TensorFlow GPU Acceleration
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 # Download NLTK data
 nltk.download('punkt')
 
