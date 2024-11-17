@@ -80,7 +80,7 @@ def extract_images(url):
 def get_faq_answer(question):
     question_lower = question.lower().strip()
     closest_match = process.extractOne(question_lower, faq.keys())
-    if closest_match[1] > 70:  # Threshold for fuzzy match confidence
+    if closest_match and closest_match[1] > 70:  # Threshold for fuzzy match confidence
         return faq[closest_match[0]]
     return None
 
@@ -132,7 +132,7 @@ def generate_image(prompt):
         img = Image.open(BytesIO(image_response.content))
         return img
     else:
-        print(f"Error generating image: {response.status_code}, {response.text}")
+        st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
         return None
 
 # Save conversation history for context
@@ -141,6 +141,9 @@ def append_to_history(user_question, bot_answer):
         "user": user_question,
         "bot": bot_answer
     })
+    # Keep history size manageable
+    if len(conversation_history) > 10:
+        conversation_history.pop(0)  # Remove the earliest entry
 
 def get_conversation_history():
     return " ".join([f"User: {item['user']} Bot: {item['bot']}" for item in conversation_history])
@@ -192,8 +195,8 @@ def main():
 
     # User's method to generate images
     st.sidebar.header("Image Generation")
-    image_prompt = st.sidebar.text_input("Enter a prompt to generate an image:")
-
+    image_prompt = st.sidebar.text_input("Enter a prompt:")
+    
     if image_prompt:
         st.sidebar.write(f"Generating image for prompt: {image_prompt}...")
         image = generate_image(image_prompt)
