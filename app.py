@@ -18,7 +18,7 @@ HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Not important; don't steal m
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 
-IMAGE_GEN_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
+IMAGE_GEN_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1"
 
 # Cache heavy operations like article fetching
 @st.cache_data
