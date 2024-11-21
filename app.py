@@ -14,7 +14,7 @@ from time import sleep
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Manually specify the version of ChromeDriver
-driver = webdriver.Chrome(executable_path=ChromeDriverManager(version="your-chrome-version").install(), options=chrome_options)
+driver = webdriver.Chrome(executable_path=ChromeDriverManager(version="131.0.6778.85").install(), options=chrome_options)
 
 # Download NLTK data
 nltk.download('punkt')
