@@ -6,10 +6,10 @@ from urllib.parse import urljoin
 from PIL import Image
 from io import BytesIO
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 
 # Download NLTK data
@@ -42,14 +42,14 @@ def fetch_article(url):
     paragraphs = content.find_all("p")
     return "\n".join([p.text for p in paragraphs])
 
-# Function to generate image using Selenium and WebDriver Manager
+# Function to generate image using Selenium and WebDriver Manager (using Chrome)
 def generate_image_using_selenium(prompt):
-    # Set up Firefox options (headless mode)
-    firefox_options = Options()
-    firefox_options.add_argument("--headless")  # Run in headless mode (no UI)
+    # Set up Chrome options (headless mode)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode (no UI)
 
-    # Automatically download and set up GeckoDriver using WebDriver Manager
-    driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=firefox_options)
+    # Automatically download and set up ChromeDriver using WebDriver Manager
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=chrome_options)
 
     # Open Craiyon website
     driver.get("https://www.craiyon.com/")
