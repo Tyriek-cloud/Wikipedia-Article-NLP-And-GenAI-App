@@ -121,6 +121,7 @@ def main():
     # User's method to generate images (Move this to a separate section in the sidebar)
     st.sidebar.header("Image Generation")
     image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
+    st.sidebar.write(response.text)
 
     if image_prompt:
         with st.spinner("Generating image..."):
