@@ -5,6 +5,7 @@ import nltk
 from urllib.parse import urljoin
 from PIL import Image
 from io import BytesIO
+import time
 
 # Download NLTK data
 nltk.download('punkt')
@@ -29,27 +30,39 @@ def fetch_article(url):
     paragraphs = content.find_all("p")
     return "\n".join([p.text for p in paragraphs])
 
-def generate_image_cached(prompt, hf_api_token):
+# Function to handle image generation with retry logic
+def generate_image_cached(prompt, hf_api_token, retries=3, delay=30):
     headers = {
         "Authorization": f"Bearer {hf_api_token}",
         "Content-Type": "application/json",
     }
-    try:
-        # Make the request to Hugging Face API
-        response = requests.post(IMAGE_GEN_URL, headers=headers, json={"inputs": prompt})
+    
+    for attempt in range(retries):
+        try:
+            # Make the request to Hugging Face API
+            response = requests.post(IMAGE_GEN_URL, headers=headers, json={"inputs": prompt})
 
-        # Handle successful response
-        if response.status_code == 200:
-            image_url = response.json()[0]["url"]
-            image_response = requests.get(image_url)
-            img = Image.open(BytesIO(image_response.content))
-            return img
-        else:
-            st.sidebar.error(f"Error generating image: {response.status_code}, {response.text}")
+            # Handle successful response
+            if response.status_code == 200:
+                image_url = response.json()[0]["url"]
+                image_response = requests.get(image_url)
+                img = Image.open(BytesIO(image_response.content))
+                return img
+            elif response.status_code == 503:
+                # If the model is loading, wait and retry
+                st.sidebar.warning(f"Model is loading. Attempt {attempt + 1} of {retries}. Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+            else:
+                # Handle other errors
+                st.sidebar.error(f"Error generating image: {response.status_code}, {response.text}")
+                return None
+        except Exception as e:
+            st.sidebar.error(f"An error occurred: {str(e)}")
             return None
-    except Exception as e:
-        st.sidebar.error(f"An error occurred: {str(e)}")
-        return None
+    
+    # If we've exhausted retries, inform the user
+    st.sidebar.error("Image generation failed after multiple attempts.")
+    return None
 
 # Summarize text
 def summarize_text(text, num_sentences=10):
