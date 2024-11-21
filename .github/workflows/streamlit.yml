@@ -22,6 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt  # Install your app's dependencies
+        pip install --upgrade webdriver-manager
 
     - name: Install NLTK data
       run: |
