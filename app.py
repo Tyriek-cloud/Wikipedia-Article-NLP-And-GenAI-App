@@ -44,8 +44,7 @@ def generate_image_cached(prompt, hf_api_token, retries=3, delay=30):
 
             # Log the full response for debugging
             st.sidebar.write(f"Response Status Code: {response.status_code}")
-            st.sidebar.write(f"Response Text: {response.text}")
-
+            
             # Handle successful response
             if response.status_code == 200:
                 # Check if the response contains valid image URL data
