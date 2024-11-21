@@ -48,10 +48,19 @@ def generate_image_cached(prompt, hf_api_token, retries=3, delay=30):
 
             # Handle successful response
             if response.status_code == 200:
-                image_url = response.json()[0]["url"]
-                image_response = requests.get(image_url)
-                img = Image.open(BytesIO(image_response.content))
-                return img
+                # Check if the response contains valid image URL data
+                response_data = response.json()
+                if "url" in response_data[0]:
+                    image_url = response_data[0]["url"]
+                    image_response = requests.get(image_url)
+
+                    if image_response.status_code == 200:
+                        img = Image.open(BytesIO(image_response.content))
+                        return img
+                    else:
+                        st.sidebar.error(f"Failed to fetch image from URL. Status code: {image_response.status_code}")
+                else:
+                    st.sidebar.error("The API response did not contain a valid image URL.")
             elif response.status_code == 503:
                 # If the model is loading, wait and retry
                 st.sidebar.warning(f"Model is loading. Attempt {attempt + 1} of {retries}. Retrying in {delay} seconds...")
