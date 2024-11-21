@@ -44,6 +44,7 @@ def generate_image_cached(prompt, hf_api_token, retries=3, delay=30):
 
             # Log the full response for debugging
             st.sidebar.write(f"Response Status Code: {response.status_code}")
+            st.sidebar.write(response.text)
             
             # Handle successful response
             if response.status_code == 200:
@@ -121,7 +122,6 @@ def main():
     # User's method to generate images (Move this to a separate section in the sidebar)
     st.sidebar.header("Image Generation")
     image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
-    st.sidebar.write(response.text)
 
     if image_prompt:
         with st.spinner("Generating image..."):
