@@ -6,6 +6,10 @@ from urllib.parse import urljoin
 from PIL import Image
 from io import BytesIO
 import base64
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from time import sleep
 
 # Download NLTK data
 nltk.download('punkt')
@@ -18,9 +22,6 @@ HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Streamlit secrets for sensit
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 
-# Replace with Craiyon API URL
-CRAIYON_URL = "https://api.craiyon.com/generate"
-
 # Cache heavy operations like article fetching and image generation
 @st.cache_data
 def fetch_article(url):
@@ -31,35 +32,33 @@ def fetch_article(url):
     paragraphs = content.find_all("p")
     return "\n".join([p.text for p in paragraphs])
 
-@st.cache_resource
-def generate_image_cached(prompt, hf_api_token=None):
-    # Since Craiyon doesn't use Hugging Face's API, we don't need the API token
-    headers = {
-        "Content-Type": "application/json",
-    }
+def generate_image_using_selenium(prompt):
+    # Set up Selenium WebDriver (Ensure you have ChromeDriver installed)
+    driver = webdriver.Chrome(executable_path="/path/to/chromedriver")  # Replace with correct path to chromedriver
 
-    payload = {
-        "prompt": prompt,
-        "num_images": 1  # Number of images you want to generate
-    }
+    # Open Craiyon website
+    driver.get("https://www.craiyon.com/")
+    
+    # Find the input field and type the prompt
+    input_box = driver.find_element(By.XPATH, "//input[@name='prompt']")
+    input_box.send_keys(prompt)
+    input_box.send_keys(Keys.RETURN)
+    
+    # Wait for the image generation to complete
+    sleep(10)  # Adjust this depending on how long it takes Craiyon to generate the image
+    
+    # Find the generated image element (XPath may change depending on Craiyon's page structure)
+    image_element = driver.find_element(By.XPATH, "//img[@class='generated-img']")
+    image_url = image_element.get_attribute("src")
+    
+    # Download the image using the URL
+    img_data = requests.get(image_url).content
+    img = Image.open(BytesIO(img_data))
+    
+    # Close the browser window
+    driver.quit()
 
-    # Request to Craiyon API
-    response = requests.post(CRAIYON_URL, headers=headers, json=payload)
-
-    if response.status_code == 200:
-        # The response from Craiyon usually contains a list of base64 images
-        image_data = response.json()  # This may vary based on the API you're using
-        if 'images' in image_data:
-            # Assuming 'images' is a list of base64-encoded images
-            image_base64 = image_data['images'][0]  # Pick the first image
-            img = Image.open(BytesIO(base64.b64decode(image_base64)))
-            return img
-        else:
-            st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
-            return None
-    else:
-        st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
-        return None
+    return img
 
 # Summarize text
 def summarize_text(text, num_sentences=10):
@@ -109,11 +108,11 @@ def main():
 
     if image_prompt:
         with st.spinner("Generating image..."):
-            image = generate_image_cached(image_prompt, HF_API_TOKEN)
-            if image:
+            try:
+                image = generate_image_using_selenium(image_prompt)
                 st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
-            else:
-                st.sidebar.write("Sorry, there was an error generating the image.")
+            except Exception as e:
+                st.sidebar.write(f"Error generating image: {e}")
 
 if __name__ == "__main__":
     main()
