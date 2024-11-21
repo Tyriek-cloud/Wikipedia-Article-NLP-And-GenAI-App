@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use Ubuntu runner for the CI environment
+    runs-on: ubuntu-latest
 
     steps:
     - name: Check out code
@@ -16,13 +16,12 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9  # Python version you want to use
+        python-version: 3.9 
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Install your app's dependencies
-        pip install --upgrade webdriver-manager
+        pip install -r requirements.txt  # Installs the app's dependencies from the requirements file
 
     - name: Install NLTK data
       run: |
