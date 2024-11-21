@@ -5,6 +5,7 @@ import nltk
 from urllib.parse import urljoin
 from PIL import Image
 from io import BytesIO
+import base64
 
 # Download NLTK data
 nltk.download('punkt')
@@ -12,12 +13,13 @@ nltk.download('punkt')
 # Global variable for article text
 article_text = ""
 
-# Add Hugging Face API token (for Image Generation)
+# Add Hugging Face API token (not needed for Craiyon)
 HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Streamlit secrets for sensitive data
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 
-IMAGE_GEN_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
+# Replace with Craiyon API URL
+CRAIYON_URL = "https://api.craiyon.com/generate"
 
 # Cache heavy operations like article fetching and image generation
 @st.cache_data
@@ -30,18 +32,31 @@ def fetch_article(url):
     return "\n".join([p.text for p in paragraphs])
 
 @st.cache_resource
-def generate_image_cached(prompt, hf_api_token):
+def generate_image_cached(prompt, hf_api_token=None):
+    # Since Craiyon doesn't use Hugging Face's API, we don't need the API token
     headers = {
-        "Authorization": f"Bearer {hf_api_token}",
         "Content-Type": "application/json",
     }
-    response = requests.post(IMAGE_GEN_URL, headers=headers, json={"inputs": prompt})
+
+    payload = {
+        "prompt": prompt,
+        "num_images": 1  # Number of images you want to generate
+    }
+
+    # Request to Craiyon API
+    response = requests.post(CRAIYON_URL, headers=headers, json=payload)
 
     if response.status_code == 200:
-        image_url = response.json()[0]["url"]
-        image_response = requests.get(image_url)
-        img = Image.open(BytesIO(image_response.content))
-        return img
+        # The response from Craiyon usually contains a list of base64 images
+        image_data = response.json()  # This may vary based on the API you're using
+        if 'images' in image_data:
+            # Assuming 'images' is a list of base64-encoded images
+            image_base64 = image_data['images'][0]  # Pick the first image
+            img = Image.open(BytesIO(base64.b64decode(image_base64)))
+            return img
+        else:
+            st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
+            return None
     else:
         st.sidebar.write(f"Error generating image: {response.status_code}, {response.text}")
         return None
