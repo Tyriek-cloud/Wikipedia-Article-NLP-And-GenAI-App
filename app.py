@@ -11,9 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
-
-# Manually specify the version of ChromeDriver
-driver = webdriver.Chrome(ChromeDriverManager().install())
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # Download NLTK data
 nltk.download('punkt')
@@ -38,43 +37,52 @@ def extract_images(url):
 # Function to fetch article text
 @st.cache_data
 def fetch_article(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'html.parser')
-    content = soup.find("div", class_="mw-parser-output")
-    paragraphs = content.find_all("p")
-    return "\n".join([p.text for p in paragraphs])
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        content = soup.find("div", class_="mw-parser-output")
+        paragraphs = content.find_all("p")
+        return "\n".join([p.text for p in paragraphs])
+    except Exception as e:
+        st.error(f"Error fetching the article: {e}")
+        return ""
+
+# Function to get a driver instance with headless Chrome
+def get_driver():
+    options = Options()
+    options.add_argument("--headless")
+    driver_path = ChromeDriverManager().install()
+    return webdriver.Chrome(executable_path=driver_path, options=options)
 
 # Function to generate image using Selenium and WebDriver Manager (using Chrome)
 def generate_image_using_selenium(prompt):
-    # Set up Chrome options (headless mode)
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode (no UI)
-
-    # Automatically download and set up ChromeDriver using WebDriver Manager
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=chrome_options)
+    driver = get_driver()
 
     # Open Craiyon website
     driver.get("https://www.craiyon.com/")
-    
-    # Find the input field and type the prompt
+
     input_box = driver.find_element(By.XPATH, "//input[@name='prompt']")
     input_box.send_keys(prompt)
     input_box.send_keys(Keys.RETURN)
-    
-    # Wait for the image generation to complete
-    sleep(10)  # Adjust this depending on how long it takes Craiyon to generate the image
-    
-    # Find the generated image element
-    image_element = driver.find_element(By.XPATH, "//img[@class='generated-img']")
-    image_url = image_element.get_attribute("src")
-    
-    # Download the image using the URL
-    img_data = requests.get(image_url).content
-    img = Image.open(BytesIO(img_data))
-    
-    # Close the browser window
-    driver.quit()
+
+    # Wait for the image to be generated
+    try:
+        image_element = WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.XPATH, "//img[@class='generated-img']"))
+        )
+        image_url = image_element.get_attribute("src")
+
+        # Download image
+        img_data = requests.get(image_url).content
+        img = Image.open(BytesIO(img_data))
+
+    except Exception as e:
+        print(f"Error during image generation: {e}")
+        return None
+
+    finally:
+        driver.quit()
 
     return img
 
@@ -117,7 +125,7 @@ def main():
             if image:
                 st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
             else:
-                st.sidebar.write("Sorry, there was an error generating the image.")
+                st.sidebar.error("Sorry, there was an error generating the image.")
 
 if __name__ == "__main__":
     main()
