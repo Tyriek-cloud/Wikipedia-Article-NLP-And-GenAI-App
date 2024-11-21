@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 
 # Manually specify the version of ChromeDriver
-driver = webdriver.Chrome(executable_path=ChromeDriverManager(version="131.0.6778.85").install(), options=chrome_options)
+driver = webdriver.Chrome(ChromeDriverManager().install())
 
 # Download NLTK data
 nltk.download('punkt')
