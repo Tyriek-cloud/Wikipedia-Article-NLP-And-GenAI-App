@@ -12,8 +12,6 @@ The user can now also interact with an Image Generator (powered by Stable Diffus
 
 The application generates a summary of 10+ sentences. The sentences are intended to pull crucial facts about the article. As opposed to reading an entire article, this can save a user time.
 
-The user may also ask questions about the Wikipedia article that was analyzed. Be sure to hit the "Analyze" button before trying to ask a question. This will ensure that the app webscrapes the relevant Wikipedia article.
-
 The user can now utilize an Image Generator. The idea is that the user can take information that is being summarized in the articles and "visualize the summary" using the image generation feature. It is sometimes useful to look at pictures as opposed to text when learning (or at least that has been the author's experience).
 
 # Image URLs
