@@ -14,7 +14,7 @@ nltk.download('punkt')
 article_text = ""
 
 # Add Hugging Face API token (for Image Generation)
-HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Streamlit secrets for sensitive data
+HF_API_TOKEN = st.secrets["hug"]["NOTIMPORTANT"]  # Not important; don't steal my secrets
 if not HF_API_TOKEN:
     raise ValueError("Hugging Face API token is missing!")
 
@@ -121,7 +121,7 @@ def main():
 
     # User's method to generate images (Move this to a separate section in the sidebar)
     st.sidebar.header("Image Generation")
-    image_prompt = st.sidebar.text_input("Enter a prompt to generate an image:")
+    image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
 
     if image_prompt:
         with st.spinner("Generating image..."):
