@@ -1,4 +1,4 @@
-# Wikipedia-Article-NLP-And-GenAI-App
+# Wikipedia-Article-Analyzer-and-GenAI-App
 
 Wikipedia Article Analyzer and GenAI App: https://wikipedia-article-analyzer-nlp-app-app-ggh9suyycuva5j6wybe5pa.streamlit.app/
 
