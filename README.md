@@ -1,12 +1,12 @@
 # Wikipedia-Article-NLP-And-GenAI-App
 
-Wikipedia Article Analyzer: https://wikipedia-article-analyzer-nlp-app-app-ggh9suyycuva5j6wybe5pa.streamlit.app/
+Wikipedia Article Analyzer and GenAI App: https://wikipedia-article-analyzer-nlp-app-app-ggh9suyycuva5j6wybe5pa.streamlit.app/
 
 <img width="879" alt="image" src="https://github.com/user-attachments/assets/3a6488be-1e0d-46d4-8903-850771c8c6f0">
 
 This project is designed to scrape articles from Wikipedia. By default, the Streamlit application will display the Wikipedia Statistics page (https://en.wikipedia.org/wiki/Statistics). The user will have the option to insert their own Wikipedia URLs. The end goal is to use Natural Language Processing to create a summary (with an emphasis on important and easily digestable details) from Wikipedia articles and display important images/pictures/graphics from each of the articles.
 
-The user can now also interact with an Image Generator (powered by Stable Diffusion). The Image Generator is an ongoing/work-in progress feature. The app's author will be continuously training the external model and the application to produce better results.
+The user can now also interact with an Image Generator (powered by Stable Diffusion). The user can use the tab option at the top of the app to switch between the Article Analyzer and Image Generator features. The Image Generator is an ongoing/work-in progress feature (there are limiations in the functionality because the app uses a free-tier of the external model). The app's author will be continuously training the external model and the application to produce better results.
 
 # Summary
 
