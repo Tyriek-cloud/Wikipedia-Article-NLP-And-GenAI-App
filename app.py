@@ -88,7 +88,7 @@ def extract_images(url):
 
 # Main function
 def main():
-    st.title("Wikipedia Article Analyzer")
+    st.title("Wikipedia Article Analyzer and GenAI App")
 
     # Adding a new feature: a sidebar for tab navigation
     with tab1:
