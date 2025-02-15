@@ -87,13 +87,19 @@ def extract_images(url):
 def main():
     st.title("Wikipedia Article Analyzer")
 
-    # Sidebar for user input (if any)
-    st.sidebar.header("User Input")
-    url_input = st.sidebar.text_input("Enter Wikipedia URL:", "https://en.wikipedia.org/wiki/Statistics")
+    # Adding a new feature: a sidebar for tab navigation
+    selected_tab = st.sidebar.radio("Select a tab:", ["Home", "Image Generation"])
 
-    # Main content
-    with st.spinner('Analyzing article...'):
-        if st.button("Analyze"):
+    if selected_tab == "Home":
+        st.header("Wikipedia Article Analyzer")
+
+        # Sidebar for user input (if any)
+        st.sidebar.header("User Input")
+        url_input = st.sidebar.text_input("Enter Wikipedia URL:", "https://en.wikipedia.org/wiki/Statistics")
+
+        # Main content
+        with st.spinner('Analyzing article...'):
+            if st.button("Analyze"):
             global article_text
             try:
                 article_text = fetch_article(url_input)  # Fetch article with caching
@@ -112,11 +118,12 @@ def main():
                 st.error(f"Error: {str(e)}")
 
     # User's method to generate images (Move this to a separate section in the sidebar)
-    st.sidebar.header("Image Generation")
-    image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
+    elif selected_tab == "Image Generation":
+        st.sidebar.header("Image Generation")
+        image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
 
-    if image_prompt:
-        with st.spinner("Generating image..."):
+        if image_prompt:
+            with st.spinner("Generating image..."):
             image = generate_image_cached(image_prompt, HF_API_TOKEN)
             if image:
                 st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
