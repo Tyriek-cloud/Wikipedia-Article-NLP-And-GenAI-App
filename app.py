@@ -7,6 +7,9 @@ from PIL import Image
 from io import BytesIO
 import time
 
+# Hardcoding tabs at the top of the app
+tab1, tab2 = st.tabs(["Article Analysis", "Image Generation"])
+
 # Download NLTK data
 nltk.download('punkt')
 
@@ -88,9 +91,7 @@ def main():
     st.title("Wikipedia Article Analyzer")
 
     # Adding a new feature: a sidebar for tab navigation
-    selected_tab = st.sidebar.radio("Select a tab:", ["Home", "Image Generation"])
-
-    if selected_tab == "Home":
+    with tab1:
         st.header("Wikipedia Article Analyzer")
 
         # Sidebar for user input (if any)
@@ -116,8 +117,9 @@ def main():
 
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
-
-    elif selected_tab == "Image Generation":
+                    
+    # Adding the second part of the new feature: a sidebar for tab navigation
+    with tab2:
         st.sidebar.header("Image Generation")
         image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
 
