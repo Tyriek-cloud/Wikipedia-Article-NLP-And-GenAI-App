@@ -100,35 +100,34 @@ def main():
         # Main content
         with st.spinner('Analyzing article...'):
             if st.button("Analyze"):
-            global article_text
-            try:
-                article_text = fetch_article(url_input)  # Fetch article with caching
-                summary = summarize_text(article_text)
+                global article_text
+                try:
+                    article_text = fetch_article(url_input)  # Fetch article with caching
+                    summary = summarize_text(article_text)
 
-                st.subheader("Summary:")
-                st.write(summary)
+                    st.subheader("Summary:")
+                    st.write(summary)
 
-                image_urls = extract_images(url_input)
-                st.subheader("Image URLs:")
-                for idx, url in enumerate(image_urls, start=1):
-                    st.image(url, caption=f"Image {idx}", use_column_width=True)
-                    st.write(url)
+                    image_urls = extract_images(url_input)
+                    st.subheader("Image URLs:")
+                    for idx, url in enumerate(image_urls, start=1):
+                        st.image(url, caption=f"Image {idx}", use_column_width=True)
+                        st.write(url)
 
-            except Exception as e:
-                st.error(f"Error: {str(e)}")
+                except Exception as e:
+                    st.error(f"Error: {str(e)}")
 
-    # User's method to generate images (Move this to a separate section in the sidebar)
     elif selected_tab == "Image Generation":
         st.sidebar.header("Image Generation")
         image_prompt = st.sidebar.text_input("Enter a detailed prompt to generate an image:", "A statistician holding a calculator.")
 
         if image_prompt:
             with st.spinner("Generating image..."):
-            image = generate_image_cached(image_prompt, HF_API_TOKEN)
-            if image:
-                st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
-            else:
-                st.sidebar.write("Sorry, there was an error generating the image.")
+                image = generate_image_cached(image_prompt, HF_API_TOKEN)
+                if image:
+                    st.image(image, caption=f"Generated image for: {image_prompt}", use_column_width=True)
+                else:
+                    st.sidebar.write("Sorry, there was an error generating the image.")
 
 if __name__ == "__main__":
     main()
