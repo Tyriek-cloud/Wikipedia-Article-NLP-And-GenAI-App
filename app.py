@@ -92,8 +92,6 @@ def main():
 
     # Adding a new feature: a sidebar for tab navigation
     with tab1:
-        st.header("Wikipedia Article Analyzer")
-
         # Sidebar for user input (if any)
         st.sidebar.header("User Input")
         url_input = st.sidebar.text_input("Enter Wikipedia URL:", "https://en.wikipedia.org/wiki/Statistics")
